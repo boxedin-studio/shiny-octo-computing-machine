@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f4bff">
 <title>Boxed In Studio</title>
 <style>
 @font-face{font-family:"Aileron";font-weight:400;font-style:normal;font-display:swap;src:url(aileron-regular.woff2) format("woff2")}
@@ -20,7 +21,7 @@ body{
   font-size:clamp(14px,1.9vh,20px);line-height:1.25;letter-spacing:-.005em;
   text-transform:uppercase;
   font-weight:700;
-  transition:background-color .9s ease-in-out,color .9s ease-in-out;
+  transition:color .9s ease-in-out;
 }
 a{color:inherit;text-decoration:none;transition:opacity .35s ease}
 /* All text starts slightly faded and turns solid white when hovered, focused or selected (the logo stays solid) */
@@ -64,7 +65,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 }
 
 /* Page intro: starts as plain blue, then the content pans out into place */
-html{overflow-x:hidden}
+html{overflow-x:hidden;background:var(--bg)}
 @keyframes pan-out{from{opacity:0;transform:scale(1.15)}to{opacity:1;transform:none}}
 .page{animation:pan-out 1.3s cubic-bezier(.16,.8,.24,1) .2s both}
 
@@ -89,13 +90,31 @@ html{overflow-x:hidden}
     </nav>
 
     <ul class="projects" id="projects">
-      <li data-tab="architecture"><a href="whananaki-residence.html" data-bg="#f2a7c3">whananaki residence</a></li>
-      <li data-tab="architecture"><a href="project-name-1.html" data-bg="#9fd9d3">project name</a></li>
-      <li data-tab="carpentry"><a href="ply-table.html" data-bg="#f0d58a">ply table</a></li>
-      <li data-tab="carpentry"><a href="totara-desktop.html" data-bg="#9fd3b4">totara desktop</a></li>
-      <li data-tab="carpentry"><a href="chopping-board.html" data-bg="#f3b49b">chopping board</a></li>
-      <li data-tab="carpentry"><a href="misc-carpentry.html" data-bg="#b9b4d9">misc carpentry</a></li>
-      <li data-tab="carpentry"><a href="project-name-2.html" data-bg="#c3b5ee">project name</a></li>
+      <!-- ARCHITECTURE -->
+      <li data-tab="architecture"><a href="whananaki-residence.html" data-bg="#56704f">whananaki residence</a></li>
+      <li data-tab="architecture"><a href="mangawhai-house.html" data-bg="#958c77">mangawhai house</a></li>
+      <li data-tab="architecture"><a href="piha-bach.html" data-bg="#9a5b3a">piha bach</a></li>
+      <li data-tab="architecture"><a href="waiheke-studio.html" data-bg="#667378">waiheke studio</a></li>
+      <li data-tab="architecture"><a href="karekare-cabin.html" data-bg="#7c7a45">karekare cabin</a></li>
+      <!-- CARPENTRY -->
+      <li data-tab="carpentry"><a href="ply-table.html" data-bg="#a8946e">ply table</a></li>
+      <li data-tab="carpentry"><a href="totara-desktop.html" data-bg="#8c5e49">totara desktop</a></li>
+      <li data-tab="carpentry"><a href="chopping-board.html" data-bg="#435c4a">chopping board</a></li>
+      <li data-tab="carpentry"><a href="misc-carpentry.html" data-bg="#a98c4a">misc carpentry</a></li>
+      <li data-tab="carpentry"><a href="oak-bench.html" data-bg="#585d5c">oak bench</a></li>
+      <li data-tab="carpentry"><a href="kauri-shelving.html" data-bg="#a0623f">kauri shelving</a></li>
+      <li data-tab="carpentry"><a href="macrocarpa-stool.html" data-bg="#8a9a84">macrocarpa stool</a></li>
+      <li data-tab="carpentry"><a href="walnut-side-table.html" data-bg="#5a4234">walnut side table</a></li>
+
+      <!-- HIDDEN PLACEHOLDERS (not shown on the site).
+           To add a project, delete the comment markers at the start and end of its line,
+           then change the name, the link (the .html file) and, if you like, the colour. -->
+      <!-- <li data-tab="architecture"><a href="project-name-a.html" data-bg="#7a5c46">project name</a></li> -->
+      <!-- <li data-tab="architecture"><a href="project-name-b.html" data-bg="#4d5f58">project name</a></li> -->
+      <!-- <li data-tab="architecture"><a href="project-name-c.html" data-bg="#a58b5a">project name</a></li> -->
+      <!-- <li data-tab="carpentry"><a href="project-name-d.html" data-bg="#6b6f4a">project name</a></li> -->
+      <!-- <li data-tab="carpentry"><a href="project-name-e.html" data-bg="#8a4a3c">project name</a></li> -->
+      <!-- <li data-tab="carpentry"><a href="project-name-f.html" data-bg="#7a7468">project name</a></li> -->
     </ul>
   </div>
 
@@ -114,8 +133,58 @@ html{overflow-x:hidden}
   var root=document.documentElement;
   var list=document.getElementById('projects');
   var base={bg:getComputedStyle(root).getPropertyValue('--bg').trim()};
+  // Background fade. The browser's built-in fade blends the two colours straight through RGB, which is why
+  // vivid blue -> brown/red passes through purple and pink. Instead, this fades the first colour's colour
+  // down to a neutral grey and then up into the new one, so the in-between colours never turn purple or pink.
+  function parse(h){h=h.trim().replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return [0,2,4].map(function(i){return parseInt(h.substr(i,2),16)/255})}
+  function lin(c){return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4)}
+  function gam(c){return c<=.0031308?12.92*c:1.055*Math.pow(c,1/2.4)-.055}
+  function toLab(c){var r=lin(c[0]),g=lin(c[1]),b=lin(c[2]);
+    var l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),
+        m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),
+        s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);
+    return [.2104542553*l+.7936177850*m-.0040720468*s,1.9779984951*l-2.4285922050*m+.4505937099*s,.0259040371*l+.7827717662*m-.8086757660*s]}
+  function toHex(L){var l=L[0]+.3963377774*L[1]+.2158037573*L[2],m=L[0]-.1055613458*L[1]-.0638541728*L[2],s=L[0]-.0894841775*L[1]-1.2914855480*L[2];
+    l=l*l*l;m=m*m*m;s=s*s*s;
+    var c=[4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.7076147010*s];
+    return '#'+c.map(function(v){v=Math.round(255*Math.min(1,Math.max(0,gam(Math.max(0,v)))));return (v<16?'0':'')+v.toString(16)}).join('')}
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  // Keep the browser's own toolbar colour (Safari's top bar, Chrome on Android) in step with the page background.
+  // Safari ignores bar colours that are too light, so the bar gets a slightly darker shade of the same colour when needed.
+  var meta=document.querySelector('meta[name="theme-color"]');
+  var BAR_MAX=.18; // maximum brightness (relative luminance); colours brighter than this got a grey bar in Safari. Raise or lower if needed
+  function barColour(hex){
+    var c=parse(hex).map(lin),Y=.2126*c[0]+.7152*c[1]+.0722*c[2];
+    if(Y<=BAR_MAX)return hex;
+    var f=BAR_MAX/Y;
+    return '#'+c.map(function(v){v=Math.round(255*gam(Math.min(1,v*f)));return (v<16?'0':'')+v.toString(16)}).join('');
+  }
+  function setBg(c){root.style.setProperty('--bg',c);if(meta)meta.setAttribute('content',barColour(c))}
+  var curLab=toLab(parse(base.bg)),target=base.bg.toLowerCase(),raf=0;
+  function fadeTo(hex){
+    hex=hex.toLowerCase();
+    if(hex===target)return;
+    target=hex;
+    var A=curLab.slice(),B=toLab(parse(hex)),t0=null,dur=900;
+    cancelAnimationFrame(raf);
+    function paint(p){
+      var e=-(Math.cos(Math.PI*p)-1)/2;
+      var k1=e<.5?1-2*e:0,k2=e<.5?0:2*e-1;
+      curLab=[A[0]+(B[0]-A[0])*e,A[1]*k1+B[1]*k2,A[2]*k1+B[2]*k2];
+      setBg(toHex(curLab));
+    }
+    if(reduce){curLab=B;setBg(hex);return}
+    // if interrupted partway, start from the colour currently on screen (its chroma is already partly faded)
+    function step(ts){
+      if(t0===null)t0=ts;
+      var p=Math.min(1,(ts-t0)/dur);
+      paint(p);
+      if(p<1)raf=requestAnimationFrame(step);else setBg(hex);
+    }
+    raf=requestAnimationFrame(step);
+  }
   var active=null;
-  function set(bg,a){root.style.setProperty('--bg',bg||base.bg);
+  function set(bg,a){fadeTo(bg||base.bg);
     root.classList.toggle('logo-fade',!!(bg&&a));
     if(active)active.classList.remove('active');
     active=a||null;
