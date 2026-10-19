@@ -63,13 +63,18 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   .info{margin-top:auto}
 }
 
+/* Page intro: starts as plain blue, then the content pans out into place */
+html{overflow-x:hidden}
+@keyframes pan-out{from{opacity:0;transform:scale(1.15)}to{opacity:1;transform:none}}
+.page{animation:pan-out 1.3s cubic-bezier(.16,.8,.24,1) .2s both}
+
 /* Projects drop down from the tab header when a tab is chosen */
 @keyframes drop-reveal{from{clip-path:inset(0 -20px 100% -20px)}to{clip-path:inset(0 -20px -20px -20px)}}
 @keyframes drop-item{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
 .projects.drop{animation:drop-reveal .5s cubic-bezier(.2,.7,.2,1) both}
 .projects.drop li{animation:drop-item .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
 
-@media (prefers-reduced-motion:reduce){body,a{transition:none}.projects.drop,.projects.drop li{animation:none}}
+@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.projects.drop,.projects.drop li{animation:none}}
 </style>
 </head>
 <body>
@@ -144,9 +149,9 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   function align(){
     var cur=tabs.querySelector('a.current');if(!cur)return;
     list.style.marginLeft='0px';
-    list.style.marginLeft=(cur.getBoundingClientRect().left-list.getBoundingClientRect().left)+'px';
+    list.style.marginLeft=(cur.offsetLeft-list.offsetLeft)+'px';
   }
-  var shown=null;
+  var shown=null,animate=false;
   function show(name){
     if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;
     if(name===shown)return name;
@@ -160,10 +165,11 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
     });
     // restart the drop-down animation
     align();
-    list.classList.remove('drop');void list.offsetWidth;list.classList.add('drop');
+    if(animate){list.classList.remove('drop');void list.offsetWidth;list.classList.add('drop');}
     return name;
   }
   show(location.hash.slice(1));
+  animate=true; // the page intro handles the first reveal; later tab changes drop down
   window.addEventListener('resize',align);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(align);
   tabLinks.forEach(function(t){
