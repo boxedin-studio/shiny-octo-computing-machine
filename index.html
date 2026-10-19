@@ -40,17 +40,16 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 /* Bottom-left info list */
 .info{list-style:none;margin:0;padding:0}
 .info a{display:inline-block;padding:1px 0}
-.info a:hover{text-decoration:underline;text-underline-offset:4px}
 
 /* Top-right logo placeholder: replace the div with <img src="..."> or inline <svg> */
-.logo{position:absolute;top:calc(var(--pad) + env(safe-area-inset-top,0px));right:var(--pad);width:390px;aspect-ratio:630.27/236.55;display:block}
+.logo{position:absolute;top:calc(var(--pad) + env(safe-area-inset-top,0px));right:var(--pad);width:312px;aspect-ratio:630.27/236.55;display:block}
 .logo [data-slot],.logo img,.logo svg{width:100%;height:100%;object-fit:contain;display:block}
 [data-slot]{display:flex;align-items:center;justify-content:center;border:1.5px solid currentColor;font-size:.8em;letter-spacing:.08em}
 
-/* Below twice the logo width (780px): logo is centred and stacked on top of the projects list */
-@media (max-width:779px){
+/* Below twice the logo width (624px): logo is centred and stacked on top of the projects list */
+@media (max-width:623px){
   .page{justify-content:flex-start;gap:28px}
-  .logo{position:static;order:-1;width:min(390px,100%);align-self:center}
+  .logo{position:static;order:-1;width:min(312px,100%);align-self:center}
   .info{margin-top:auto}
 }
 
@@ -88,7 +87,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   var list=document.getElementById('projects');
   var base={bg:getComputedStyle(root).getPropertyValue('--bg').trim()};
   var active=null;
-  function set(bg,a){root.style.setProperty('--bg',bg);
+  function set(bg,a){root.style.setProperty('--bg',bg||base.bg);
     if(active)active.classList.remove('active');
     active=a||null;
     if(active){active.classList.add('active');root.classList.add('dimmed')}else root.classList.remove('dimmed')}
@@ -101,6 +100,17 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   var off=function(){set(base.bg,null)};
   list.addEventListener('mouseleave',off);
   list.addEventListener('focusout',off);
+
+  // Bottom-left info links: same dim-the-rest focus effect, background stays blue
+  var info=document.querySelector('.info');
+  info.querySelectorAll('a').forEach(function(a){
+    var on=function(){set(null,a)};
+    a.addEventListener('mouseenter',on);
+    a.addEventListener('focus',on);
+    a.addEventListener('touchstart',on,{passive:true});
+  });
+  info.addEventListener('mouseleave',off);
+  info.addEventListener('focusout',off);
 })();
 </script>
 </body>
