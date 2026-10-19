@@ -23,8 +23,11 @@ body{
   transition:background-color .45s ease,color .45s ease;
 }
 a{color:inherit;text-decoration:none;transition:opacity .35s ease}
-/* While a project is hovered, white text stays white but dims slightly; the hovered project stays full */
-html.dimmed .page a:not(.active){opacity:.6}
+/* All text starts slightly faded and turns solid white when hovered, focused or selected (the logo stays solid) */
+.page a:not(.logo){opacity:.6}
+.page a:not(.logo):hover,.page a:not(.logo):focus-visible,.page a.active,.page a.current{opacity:1}
+/* The logo stays solid, and only fades while a project is hovered */
+html.logo-fade .logo{opacity:.6}
 a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 
 .page{
@@ -32,6 +35,12 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   padding:calc(var(--pad) + env(safe-area-inset-top,0px)) var(--pad) calc(var(--pad) + env(safe-area-inset-bottom,0px));
   display:flex;flex-direction:column;justify-content:space-between;gap:48px;
 }
+
+/* Top-left block: tabs above the project list */
+.top{display:flex;flex-direction:column;gap:20px}
+.tabs{display:flex;gap:1.5em}
+.tabs a{display:inline-block;padding:4px 0}
+[hidden]{display:none!important}
 
 /* Top-left project list: first line sits level with the top of the logo */
 .projects{list-style:none;margin:0;padding:0}
@@ -54,7 +63,13 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   .info{margin-top:auto}
 }
 
-@media (prefers-reduced-motion:reduce){body,a{transition:none}}
+/* Projects drop down from the tab header when a tab is chosen */
+@keyframes drop-reveal{from{clip-path:inset(0 -20px 100% -20px)}to{clip-path:inset(0 -20px -20px -20px)}}
+@keyframes drop-item{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+.projects.drop{animation:drop-reveal .5s cubic-bezier(.2,.7,.2,1) both}
+.projects.drop li{animation:drop-item .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+
+@media (prefers-reduced-motion:reduce){body,a{transition:none}.projects.drop,.projects.drop li{animation:none}}
 </style>
 </head>
 <body>
@@ -62,15 +77,22 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 
   <a class="logo" href="#" aria-label="Boxed In home"></a>
 
-  <ul class="projects" id="projects">
-    <li><a href="whananaki-residence.html" data-bg="#f2a7c3">whananaki residence</a></li>
-    <li><a href="ply-table.html" data-bg="#f0d58a">ply table</a></li>
-    <li><a href="totara-desktop.html" data-bg="#9fd3b4">totara desktop</a></li>
-    <li><a href="chopping-board.html" data-bg="#f3b49b">chopping board</a></li>
-    <li><a href="misc-carpentry.html" data-bg="#b9b4d9">misc carpentry</a></li>
-    <li><a href="project-name-1.html" data-bg="#9fd9d3">project name</a></li>
-    <li><a href="project-name-2.html" data-bg="#c3b5ee">project name</a></li>
-  </ul>
+  <div class="top">
+    <nav class="tabs" id="tabs">
+      <a href="#architecture" data-tab="architecture">architecture</a>
+      <a href="#carpentry" data-tab="carpentry">carpentry</a>
+    </nav>
+
+    <ul class="projects" id="projects">
+      <li data-tab="architecture"><a href="whananaki-residence.html" data-bg="#f2a7c3">whananaki residence</a></li>
+      <li data-tab="architecture"><a href="project-name-1.html" data-bg="#9fd9d3">project name</a></li>
+      <li data-tab="carpentry"><a href="ply-table.html" data-bg="#f0d58a">ply table</a></li>
+      <li data-tab="carpentry"><a href="totara-desktop.html" data-bg="#9fd3b4">totara desktop</a></li>
+      <li data-tab="carpentry"><a href="chopping-board.html" data-bg="#f3b49b">chopping board</a></li>
+      <li data-tab="carpentry"><a href="misc-carpentry.html" data-bg="#b9b4d9">misc carpentry</a></li>
+      <li data-tab="carpentry"><a href="project-name-2.html" data-bg="#c3b5ee">project name</a></li>
+    </ul>
+  </div>
 
   <ul class="info">
     <li><a href="#">archive</a></li>
@@ -89,6 +111,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   var base={bg:getComputedStyle(root).getPropertyValue('--bg').trim()};
   var active=null;
   function set(bg,a){root.style.setProperty('--bg',bg||base.bg);
+    root.classList.toggle('logo-fade',!!(bg&&a));
     if(active)active.classList.remove('active');
     active=a||null;
     if(active){active.classList.add('active');root.classList.add('dimmed')}else root.classList.remove('dimmed')}
@@ -112,6 +135,50 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
   });
   info.addEventListener('mouseleave',off);
   info.addEventListener('focusout',off);
+
+  // Tabs: show only the projects for the chosen medium (architecture / carpentry)
+  var tabs=document.getElementById('tabs');
+  var tabLinks=Array.prototype.slice.call(tabs.querySelectorAll('a'));
+  var items=list.querySelectorAll('li');
+  // Line the project list up under the tab it drops down from
+  function align(){
+    var cur=tabs.querySelector('a.current');if(!cur)return;
+    list.style.marginLeft='0px';
+    list.style.marginLeft=(cur.getBoundingClientRect().left-list.getBoundingClientRect().left)+'px';
+  }
+  var shown=null;
+  function show(name){
+    if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;
+    if(name===shown)return name;
+    shown=name;
+    tabLinks.forEach(function(t){t.classList.toggle('current',t.dataset.tab===name)});
+    var i=0;
+    items.forEach(function(li){
+      var vis=li.dataset.tab===name;
+      li.hidden=!vis;
+      if(vis)li.style.setProperty('--i',i++);
+    });
+    // restart the drop-down animation
+    align();
+    list.classList.remove('drop');void list.offsetWidth;list.classList.add('drop');
+    return name;
+  }
+  show(location.hash.slice(1));
+  window.addEventListener('resize',align);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(align);
+  tabLinks.forEach(function(t){
+    var on=function(){set(null,t)};
+    t.addEventListener('mouseenter',on);
+    t.addEventListener('focus',on);
+    t.addEventListener('touchstart',on,{passive:true});
+    t.addEventListener('click',function(e){
+      e.preventDefault();
+      history.replaceState(null,'','#'+show(t.dataset.tab));
+    });
+  });
+  tabs.addEventListener('mouseleave',off);
+  tabs.addEventListener('focusout',off);
+  window.addEventListener('hashchange',function(){show(location.hash.slice(1))});
 })();
 </script>
 </body>
