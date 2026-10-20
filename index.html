@@ -29,21 +29,29 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .logo{position:absolute;top:calc(var(--pad) + env(safe-area-inset-top,0px));right:var(--pad);width:312px;aspect-ratio:623.62/257.95;display:block;background-color:currentColor;-webkit-mask:url(boxed-in-logo.svg) center/contain no-repeat;mask:url(boxed-in-logo.svg) center/contain no-repeat}
 .logo [data-slot],.logo img,.logo svg{width:100%;height:100%;object-fit:contain;display:block}
 [data-slot]{display:flex;align-items:center;justify-content:center;border:1.5px solid currentColor;font-size:.8em;letter-spacing:.08em}
-@media (max-width:623px){.page{justify-content:flex-start;gap:28px}.logo{position:static;order:-1;width:min(312px,100%);align-self:center}.info{margin-top:auto}}
+/* At narrower widths, move the logo into the page flow so it never overlaps the project list. */
+@media (max-width:900px){.page{justify-content:flex-start;gap:28px}.logo{position:static;order:-1;width:min(312px,70vw);align-self:flex-start}.info{margin-top:auto}}
+@media (max-width:623px){.logo{width:min(312px,100%);align-self:center}}
 html{overflow-x:hidden;background:var(--bg)}
 @keyframes pan-out{from{opacity:0;transform:scale(1.15)}to{opacity:1;transform:none}}
 .page{animation:pan-out 1.3s cubic-bezier(.16,.8,.24,1) .2s both}
 
-/* The list closes before its items are replaced, then unfolds from the active tab. */
+/*
+  ADJUSTABLE PROJECT-LIST ANIMATION
+  Change these values to tune the letter wave:
+  --letter-step: delay between letters (smaller = faster)
+  --row-step: extra delay between rows (smaller = rows follow sooner)
+  --letter-duration: how long each letter takes to drop in / lift out
+*/
+:root{--letter-step:8ms;--row-step:20ms;--letter-duration:180ms}
 .projects{transform-origin:top;will-change:height}
-.projects.drop-open{animation:drop-reveal .52s cubic-bezier(.2,.7,.2,1) both}
-.projects.drop-open li{animation:drop-item .48s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*35ms)}
-@keyframes drop-reveal{from{clip-path:inset(0 -20px 100% -20px)}to{clip-path:inset(0 -20px -20px -20px)}}
-@keyframes drop-item{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
-@keyframes fold-away{from{clip-path:inset(0 -20px -20px -20px);opacity:1}to{clip-path:inset(0 -20px 100% -20px);opacity:0}}
-.projects.drop-close{animation:fold-away .24s cubic-bezier(.4,0,.8,.4) both;pointer-events:none}
-.projects.drop-close li{animation:none!important}
-@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.projects.drop-open,.projects.drop-open li,.projects.drop-close{animation:none!important}}
+.projects li{overflow:visible}
+.project-letter{display:inline-block;white-space:pre;will-change:transform,opacity}
+.projects.drop-open .project-letter{animation:letter-drop var(--letter-duration) cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--letter-delay,0ms)}
+.projects.drop-close .project-letter{animation:letter-lift var(--letter-duration) cubic-bezier(.4,0,.8,.4) both;animation-delay:var(--letter-delay,0ms)}
+@keyframes letter-drop{from{opacity:0;transform:translateY(-.7em)}to{opacity:1;transform:translateY(0)}}
+@keyframes letter-lift{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-.7em)}}
+@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.project-letter{animation:none!important}.projects{transition:none!important}}
 </style>
 </head>
 <body>
@@ -101,14 +109,8 @@ html{overflow-x:hidden;background:var(--bg)}
   function toHex(L){var l=L[0]+.3963377774*L[1]+.2158037573*L[2],m=L[0]-.1055613458*L[1]-.0638541728*L[2],s=L[0]-.0894841775*L[1]-1.2914855480*L[2];l=l*l*l;m=m*m*m;s=s*s*s;var c=[4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.7076147010*s];return '#'+c.map(function(v){v=Math.round(255*Math.min(1,Math.max(0,gam(Math.max(0,v)))));return (v<16?'0':'')+v.toString(16)}).join('')}
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   var meta=document.querySelector('meta[name="theme-color"]');
-  // Keep Safari's theme colour in sync with the actual page colour. Previously,
-  // brighter hover colours were deliberately darkened here, which could make
-  // warm taupes and yellows appear grey in Safari's toolbar.
-  function setBg(c){
-    root.style.setProperty('--bg',c);
-    document.body.style.backgroundColor=c;
-    if(meta)meta.setAttribute('content',c);
-  }
+  // Keep Safari's theme colour in sync with the actual page colour.
+  function setBg(c){root.style.setProperty('--bg',c);document.body.style.backgroundColor=c;if(meta)meta.setAttribute('content',c)}
   var curLab=toLab(parse(base.bg)),target=base.bg.toLowerCase(),raf=0;
   function fadeTo(hex){hex=hex.toLowerCase();if(hex===target)return;target=hex;var A=curLab.slice(),B=toLab(parse(hex)),t0=null,dur=900;cancelAnimationFrame(raf);function paint(p){var e=-(Math.cos(Math.PI*p)-1)/2,k1=e<.5?1-2*e:0,k2=e<.5?0:2*e-1;curLab=[A[0]+(B[0]-A[0])*e,A[1]*k1+B[1]*k2,A[2]*k1+B[2]*k2];setBg(toHex(curLab))}if(reduce){curLab=B;setBg(hex);return}function step(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur);paint(p);if(p<1)raf=requestAnimationFrame(step);else setBg(hex)}raf=requestAnimationFrame(step)}
   var active=null;
@@ -124,10 +126,50 @@ html{overflow-x:hidden;background:var(--bg)}
   var tabLinks=Array.prototype.slice.call(tabs.querySelectorAll('a'));
   var items=Array.prototype.slice.call(list.querySelectorAll('li'));
   var shown=null,animating=false,pendingName=null,closeTimer=0;
+  var letterStep=parseFloat(getComputedStyle(root).getPropertyValue('--letter-step'))||18;
+  var rowStep=parseFloat(getComputedStyle(root).getPropertyValue('--row-step'))||38;
+  var letterDuration=parseFloat(getComputedStyle(root).getPropertyValue('--letter-duration'))||300;
+  function buildLetters(){
+    items.forEach(function(li){
+      var a=li.querySelector('a');
+      if(!a||a.dataset.lettersBuilt)return;
+      var label=a.textContent;
+      a.setAttribute('aria-label',label);
+      a.textContent='';
+      Array.from(label).forEach(function(ch){
+        var span=document.createElement('span');
+        span.className='project-letter';
+        span.setAttribute('aria-hidden','true');
+        span.textContent=ch;
+        a.appendChild(span);
+      });
+      a.dataset.lettersBuilt='true';
+    });
+  }
+  buildLetters();
+  function setLetterDelays(){
+    var visibleRow=0;
+    items.forEach(function(li){
+      if(li.hidden)return;
+      var letters=li.querySelectorAll('.project-letter');
+      letters.forEach(function(letter,charIndex){
+        letter.style.setProperty('--letter-delay',(visibleRow*rowStep+charIndex*letterStep)+'ms');
+      });
+      visibleRow++;
+    });
+  }
+  function totalWaveTime(name){
+    var max=0;
+    items.forEach(function(li){
+      if(li.dataset.tab!==name)return;
+      var letters=li.querySelectorAll('.project-letter').length;
+      max=Math.max(max,letters?((letters-1)*letterStep):0);
+    });
+    var rowCount=items.filter(function(li){return li.dataset.tab===name}).length;
+    return Math.max(0,(rowCount-1)*rowStep+max+letterDuration);
+  }
   function align(){
     var cur=tabs.querySelector('a.current');if(!cur)return;
-    // Measure the selected tab against their shared parent, not against the list's
-    // current position (which already includes marginLeft). This avoids cumulative drift.
     var parent=list.parentElement.getBoundingClientRect();
     var tab=cur.getBoundingClientRect();
     list.style.marginLeft=Math.max(0,tab.left-parent.left)+'px';
@@ -135,9 +177,8 @@ html{overflow-x:hidden;background:var(--bg)}
   function markTab(name){tabLinks.forEach(function(t){var selected=t.dataset.tab===name;t.classList.toggle('current',selected);t.setAttribute('aria-selected',selected?'true':'false');t.setAttribute('tabindex',selected?'0':'-1')});list.setAttribute('aria-label',name+' projects')}
   function reveal(name){
     shown=name;markTab(name);
-    var i=0;
-    items.forEach(function(li){var visible=li.dataset.tab===name;li.hidden=!visible;if(visible)li.style.setProperty('--i',i++)});
-    align();
+    items.forEach(function(li){li.hidden=li.dataset.tab!==name});
+    setLetterDelays();align();
     list.classList.remove('drop-close','drop-open');
     if(reduce){list.style.height='auto'}
     else{
@@ -145,7 +186,7 @@ html{overflow-x:hidden;background:var(--bg)}
       void list.offsetHeight;
       list.classList.add('drop-open');
       list.style.height=list.scrollHeight+'px';
-      window.setTimeout(function(){if(!animating)list.style.height='auto'},540);
+      window.setTimeout(function(){if(!animating)list.style.height='auto'},totalWaveTime(name)+30);
     }
     animating=false;
     if(pendingName&&pendingName!==shown){var next=pendingName;pendingName=null;show(next)}
@@ -154,22 +195,25 @@ html{overflow-x:hidden;background:var(--bg)}
   function show(name){
     if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;
     if(name===shown&&!animating)return name;
-    clearTimeout(closeTimer);
     if(animating){pendingName=name;return name}
+    clearTimeout(closeTimer);
     if(shown===null){reveal(name);return name}
     if(name===shown)return name;
     pendingName=name;animating=true;
     list.classList.remove('drop-open');
     if(reduce){reveal(name);return name}
-    list.style.height=list.scrollHeight+'px';
+    setLetterDelays();
+    list.classList.remove('drop-close');
     void list.offsetHeight;
-    list.classList.remove('drop-close');list.classList.add('drop-close');
-    list.style.height='0px';
-    closeTimer=window.setTimeout(function(){var next=pendingName||name;pendingName=null;reveal(next)},280);
+    list.classList.add('drop-close');
+    closeTimer=window.setTimeout(function(){
+      var next=pendingName||name;
+      list.style.height='0px';
+      window.setTimeout(function(){var latest=pendingName||next;pendingName=null;reveal(latest)},280);
+    },totalWaveTime(shown));
     return name;
   }
-  // Start with Architecture (or the category requested in the URL) without a closing animation.
-  function initialShow(name){if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;shown=name;markTab(name);var i=0;items.forEach(function(li){var visible=li.dataset.tab===name;li.hidden=!visible;if(visible)li.style.setProperty('--i',i++)});align()}
+  function initialShow(name){if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;shown=name;markTab(name);items.forEach(function(li){li.hidden=li.dataset.tab!==name});setLetterDelays();align()}
   initialShow(location.hash.slice(1));
   list.style.height='auto';
   window.addEventListener('resize',align);
