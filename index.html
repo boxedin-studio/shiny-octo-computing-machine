@@ -214,8 +214,16 @@ html{overflow-x:hidden;background:var(--bg)}
     return name;
   }
   function initialShow(name){if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;shown=name;markTab(name);items.forEach(function(li){li.hidden=li.dataset.tab!==name});setLetterDelays();align()}
-  initialShow(location.hash.slice(1));
-  list.style.height='auto';
+  // Keep the list closed during the opening animation, then wave in Architecture.
+  var initialName=tabLinks.some(function(t){return t.dataset.tab===location.hash.slice(1)})
+    ? location.hash.slice(1) : 'architecture';
+  shown=null;
+  markTab(initialName);
+  items.forEach(function(li){li.hidden=true});
+  list.style.height='0px';
+  window.setTimeout(function(){
+    if(shown===null)show(initialName);
+  },1500);
   window.addEventListener('resize',align);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(align);
   tabLinks.forEach(function(t,index){
