@@ -51,7 +51,7 @@ html{overflow-x:hidden;background:var(--bg)}
 .projects.drop-close .project-letter{animation:letter-lift var(--letter-duration) cubic-bezier(.4,0,.8,.4) both;animation-delay:var(--letter-delay,0ms)}
 @keyframes letter-drop{from{opacity:0;transform:translateY(-.7em)}to{opacity:1;transform:translateY(0)}}
 @keyframes letter-lift{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-.7em)}}
-@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.project-letter{animation:none!important}.projects{transition:none!important}}
+@media (prefers-reduced-motion:reduce){body,a{:none}.page,.project-letter{animation:none!important}.projects{:none!important}}
 </style>
 </head>
 <body>
@@ -112,7 +112,7 @@ html{overflow-x:hidden;background:var(--bg)}
   // Keep Safari's theme colour in sync with the actual page colour.
   function setBg(c){root.style.setProperty('--bg',c);document.body.style.backgroundColor=c;if(meta)meta.setAttribute('content',c)}
   var curLab=toLab(parse(base.bg)),target=base.bg.toLowerCase(),raf=0;
-  function fadeTo(hex){hex=hex.toLowerCase();if(hex===target)return;target=hex;var A=curLab.slice(),B=toLab(parse(hex)),t0=null,dur=900;cancelAnimationFrame(raf);function paint(p){var e=-(Math.cos(Math.PI*p)-1)/2,k1=e<.5?1-2*e:0,k2=e<.5?0:2*e-1;curLab=[A[0]+(B[0]-A[0])*e,A[1]*k1+B[1]*k2,A[2]*k1+B[2]*k2];setBg(toHex(curLab))}if(reduce){curLab=B;setBg(hex);return}function step(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur);paint(p);if(p<1)raf=requestAnimationFrame(step);else setBg(hex)}raf=requestAnimationFrame(step)}
+  function fadeTo(hex){hex=hex.toLowerCase();if(hex===target)return;target=hex;var A=curLab.slice(),B=toLab(parse(hex)),t0=null,dur=300;cancelAnimationFrame(raf);function paint(p){var e=-(Math.cos(Math.PI*p)-1)/2,k1=e<.5?1-2*e:0,k2=e<.5?0:2*e-1;curLab=[A[0]+(B[0]-A[0])*e,A[1]*k1+B[1]*k2,A[2]*k1+B[2]*k2];setBg(toHex(curLab))}if(reduce){curLab=B;setBg(hex);return}function step(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur);paint(p);if(p<1)raf=requestAnimationFrame(step);else setBg(hex)}raf=requestAnimationFrame(step)}
   var active=null;
   function set(bg,a){fadeTo(bg||base.bg);root.classList.toggle('logo-fade',!!(bg&&a));if(active)active.classList.remove('active');active=a||null;if(active)active.classList.add('active')}
   list.querySelectorAll('a').forEach(function(a){var on=function(){set(a.dataset.bg,a)};a.addEventListener('mouseenter',on);a.addEventListener('focus',on);a.addEventListener('touchstart',on,{passive:true})});
