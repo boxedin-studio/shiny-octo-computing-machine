@@ -23,7 +23,8 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 
 /* ---- Project page content (filled in from projects.js) ---- */
 #project-body{display:flex;flex-direction:column;gap:clamp(32px,6vh,64px)}
-.desc{max-width:46ch;font-weight:400;text-transform:none;font-size:1.1em;line-height:1.4}
+.desc{max-width:46ch;font-weight:300;text-transform:none;font-size:1.2em;line-height:1.9}
+@media(min-width:624px){.desc{text-align:justify}}
 .desc p{margin:0 0 1em}
 .desc p:last-child{margin-bottom:0}
 .desc a{text-decoration:underline}
