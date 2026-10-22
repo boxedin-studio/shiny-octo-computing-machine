@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2f4bff">
 <title>Boxed In Studio</title>
+<meta name="description" content="Architecture and carpentry by Boxed In Studio.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Boxed In Studio">
+<meta property="og:title" content="Boxed In Studio">
+<meta property="og:description" content="Architecture and carpentry by Boxed In Studio.">
+<meta property="og:url" content="https://boxedin.studio/">
+<meta property="og:image" content="https://boxedin.studio/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 @font-face{font-family:"Aileron";font-weight:400;font-style:normal;font-display:swap;src:url(aileron-regular.woff2) format("woff2")}
 @font-face{font-family:"Aileron";font-weight:700;font-style:normal;font-display:swap;src:url(aileron-bold.woff2) format("woff2")}
@@ -22,7 +32,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .tabs{display:flex;gap:1.5em}
 .tabs a{display:inline-block;padding:4px 0}
 [hidden]{display:none!important}
-.projects{list-style:none;margin:0;padding:0;overflow:hidden;height:auto;transition:height .28s cubic-bezier(.2,.7,.2,1)}
+.projects{display:grid}
 .projects a{display:inline-block;padding:4px 0}
 .info{list-style:none;margin:0;padding:0}
 .info a{display:inline-block;padding:1px 0}
@@ -37,21 +47,19 @@ html{overflow-x:hidden;background:var(--bg)}
 .page{animation:pan-out 1.3s cubic-bezier(.16,.8,.24,1) .2s both}
 
 /*
-  ADJUSTABLE PROJECT-LIST ANIMATION
-  Change these values to tune the letter wave:
-  --letter-step: delay between letters (smaller = faster)
-  --row-step: extra delay between rows (smaller = rows follow sooner)
-  --letter-duration: how long each letter takes to drop in / lift out
+  PROJECT-LIST ANIMATION (rows fade and drop in one after another; the old list fades out at the same time)
+  Open: --row-in-step is the delay between rows, --row-in-time is how long each row takes.
+  Close: --row-out-step and --row-out-time. Keep the numbers in the script (rowOutStep, rowOutTime) the same as the CSS ones.
 */
-:root{--letter-step:8ms;--row-step:20ms;--letter-duration:180ms}
-.projects{transform-origin:top;will-change:height}
-.projects li{overflow:visible}
-.project-letter{display:inline-block;white-space:pre;will-change:transform,opacity}
-.projects.drop-open .project-letter{animation:letter-drop var(--letter-duration) cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--letter-delay,0ms)}
-.projects.drop-close .project-letter{animation:letter-lift var(--letter-duration) cubic-bezier(.4,0,.8,.4) both;animation-delay:var(--letter-delay,0ms)}
-@keyframes letter-drop{from{opacity:0;transform:translateY(-.7em)}to{opacity:1;transform:translateY(0)}}
-@keyframes letter-lift{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-.7em)}}
-@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.project-letter{animation:none!important}.projects{transition:none!important}}
+:root{--row-in-step:70ms;--row-in-time:500ms;--row-out-step:40ms;--row-out-time:350ms}
+.group{grid-area:1/1;list-style:none;margin:0;padding:0;visibility:hidden;pointer-events:none}
+.group.open{visibility:visible;pointer-events:auto}
+.group.closing{pointer-events:none}
+.group.opening li{animation:row-in var(--row-in-time) cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*var(--row-in-step))}
+.group.closing li{animation:row-out var(--row-out-time) cubic-bezier(.4,0,.8,.4) both;animation-delay:calc(var(--i)*var(--row-out-step))}
+@keyframes row-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes row-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.group li{animation:none!important}}
 </style>
 </head>
 <body>
@@ -59,7 +67,7 @@ html{overflow-x:hidden;background:var(--bg)}
   <a class="logo" href="index.html" aria-label="Boxed In home"></a>
   <div class="top">
     <nav class="tabs" id="tabs" role="tablist" aria-label="Project categories"></nav>
-    <ul class="projects" id="projects" role="tabpanel"></ul>
+    <div class="projects" id="projects"></div>
   </div>
   <ul class="info">
     <li><a href="#">archive</a></li>
@@ -74,8 +82,16 @@ html{overflow-x:hidden;background:var(--bg)}
 (function(){
   var S=window.SITE||{mediums:[],projects:[]};
   var tabs=document.getElementById('tabs'),list=document.getElementById('projects');
-  S.mediums.forEach(function(m){var a=document.createElement('a');a.href='#'+m.id;a.dataset.tab=m.id;a.setAttribute('role','tab');a.setAttribute('aria-controls','projects');a.textContent=m.label;tabs.appendChild(a)});
-  S.projects.forEach(function(p){var li=document.createElement('li');li.dataset.tab=p.medium;var a=document.createElement('a');a.href=p.id+'.html';a.dataset.bg=p.color;a.textContent=p.name;li.appendChild(a);list.appendChild(li)});
+  var groups={};
+  S.mediums.forEach(function(m){
+    var a=document.createElement('a');a.href='#'+m.id;a.dataset.tab=m.id;a.setAttribute('role','tab');a.setAttribute('aria-controls','projects');a.textContent=m.label;tabs.appendChild(a);
+    var ul=document.createElement('ul');ul.className='group';ul.dataset.tab=m.id;ul.setAttribute('aria-label',m.label+' projects');ul.setAttribute('aria-hidden','true');list.appendChild(ul);groups[m.id]=ul;
+  });
+  S.projects.forEach(function(p){
+    var ul=groups[p.medium];if(!ul)return;
+    var li=document.createElement('li');li.style.setProperty('--i',ul.children.length);
+    var a=document.createElement('a');a.href=p.id+'.html';a.dataset.bg=p.color;a.textContent=p.name;li.appendChild(a);ul.appendChild(li);
+  });
 })();
 </script>
 <script>
@@ -105,106 +121,45 @@ html{overflow-x:hidden;background:var(--bg)}
 
   var tabs=document.getElementById('tabs');
   var tabLinks=Array.prototype.slice.call(tabs.querySelectorAll('a'));
-  var items=Array.prototype.slice.call(list.querySelectorAll('li'));
-  var shown=null,animating=false,pendingName=null,closeTimer=0;
-  var letterStep=parseFloat(getComputedStyle(root).getPropertyValue('--letter-step'))||18;
-  var rowStep=parseFloat(getComputedStyle(root).getPropertyValue('--row-step'))||38;
-  var letterDuration=parseFloat(getComputedStyle(root).getPropertyValue('--letter-duration'))||300;
-  function buildLetters(){
-    items.forEach(function(li){
-      var a=li.querySelector('a');
-      if(!a||a.dataset.lettersBuilt)return;
-      var label=a.textContent;
-      a.setAttribute('aria-label',label);
-      a.textContent='';
-      Array.from(label).forEach(function(ch){
-        var span=document.createElement('span');
-        span.className='project-letter';
-        span.setAttribute('aria-hidden','true');
-        span.textContent=ch;
-        a.appendChild(span);
-      });
-      a.dataset.lettersBuilt='true';
-    });
-  }
-  buildLetters();
-  function setLetterDelays(){
-    var visibleRow=0;
-    items.forEach(function(li){
-      if(li.hidden)return;
-      var letters=li.querySelectorAll('.project-letter');
-      letters.forEach(function(letter,charIndex){
-        letter.style.setProperty('--letter-delay',(visibleRow*rowStep+charIndex*letterStep)+'ms');
-      });
-      visibleRow++;
-    });
-  }
-  function totalWaveTime(name){
-    var max=0;
-    items.forEach(function(li){
-      if(li.dataset.tab!==name)return;
-      var letters=li.querySelectorAll('.project-letter').length;
-      max=Math.max(max,letters?((letters-1)*letterStep):0);
-    });
-    var rowCount=items.filter(function(li){return li.dataset.tab===name}).length;
-    return Math.max(0,(rowCount-1)*rowStep+max+letterDuration);
-  }
+  var groups={};
+  Array.prototype.forEach.call(list.querySelectorAll('.group'),function(g){groups[g.dataset.tab]=g});
+  var current=null;
+  var rowOutStep=40,rowOutTime=350; // keep the same as --row-out-step and --row-out-time in the CSS
+  function markTab(name){tabLinks.forEach(function(t){var on=t.dataset.tab===name;t.classList.toggle('current',on);t.setAttribute('aria-selected',on?'true':'false');t.setAttribute('tabindex',on?'0':'-1')})}
+  // Line each list up under its own tab, and size the block to the open list
   function align(){
-    var cur=tabs.querySelector('a.current');if(!cur)return;
-    var parent=list.parentElement.getBoundingClientRect();
-    var tab=cur.getBoundingClientRect();
-    list.style.marginLeft=Math.max(0,tab.left-parent.left)+'px';
+    tabLinks.forEach(function(t){var g=groups[t.dataset.tab];if(g)g.style.marginLeft=Math.max(0,t.offsetLeft-list.offsetLeft)+'px'});
+    if(current&&groups[current])list.style.height=groups[current].offsetHeight+'px';
   }
-  function markTab(name){tabLinks.forEach(function(t){var selected=t.dataset.tab===name;t.classList.toggle('current',selected);t.setAttribute('aria-selected',selected?'true':'false');t.setAttribute('tabindex',selected?'0':'-1')});list.setAttribute('aria-label',name+' projects')}
-  function reveal(name){
-    shown=name;markTab(name);
-    items.forEach(function(li){li.hidden=li.dataset.tab!==name});
-    setLetterDelays();align();
-    list.classList.remove('drop-close','drop-open');
-    if(reduce){list.style.height='auto'}
-    else{
-      list.style.height='0px';
-      void list.offsetHeight;
-      list.classList.add('drop-open');
-      list.style.height=list.scrollHeight+'px';
-      window.setTimeout(function(){if(!animating)list.style.height='auto'},totalWaveTime(name)+30);
-    }
-    animating=false;
-    if(pendingName&&pendingName!==shown){var next=pendingName;pendingName=null;show(next)}
-    else pendingName=null;
+  function openGroup(g){
+    clearTimeout(g._t);
+    g.classList.remove('closing','opening');void g.offsetWidth;
+    g.classList.add('open');
+    if(!reduce)g.classList.add('opening');
+    g.removeAttribute('aria-hidden');
   }
+  function closeGroup(g){
+    if(!g.classList.contains('open')||g.classList.contains('closing'))return;
+    g.classList.remove('opening');
+    g.setAttribute('aria-hidden','true');
+    if(reduce){g.classList.remove('open');return}
+    g.classList.add('closing');
+    g._t=setTimeout(function(){g.classList.remove('open','closing')},(g.children.length-1)*rowOutStep+rowOutTime+40);
+  }
+  // Opening one list and closing the other happen at the same moment
   function show(name){
-    if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;
-    if(name===shown&&!animating)return name;
-    if(animating){pendingName=name;return name}
-    clearTimeout(closeTimer);
-    if(shown===null){reveal(name);return name}
-    if(name===shown)return name;
-    pendingName=name;animating=true;
-    list.classList.remove('drop-open');
-    if(reduce){reveal(name);return name}
-    setLetterDelays();
-    list.classList.remove('drop-close');
-    void list.offsetHeight;
-    list.classList.add('drop-close');
-    closeTimer=window.setTimeout(function(){
-      var next=pendingName||name;
-      list.style.height='0px';
-      window.setTimeout(function(){var latest=pendingName||next;pendingName=null;reveal(latest)},280);
-    },totalWaveTime(shown));
+    if(!groups[name])name=tabLinks[0].dataset.tab;
+    if(name===current)return name;
+    current=name;markTab(name);
+    Object.keys(groups).forEach(function(k){if(k!==name)closeGroup(groups[k])});
+    openGroup(groups[name]);
+    align();
     return name;
   }
-  function initialShow(name){if(!tabLinks.some(function(t){return t.dataset.tab===name}))name=tabLinks[0].dataset.tab;shown=name;markTab(name);items.forEach(function(li){li.hidden=li.dataset.tab!==name});setLetterDelays();align()}
-  // Keep the list closed during the opening animation, then wave in Architecture.
-  var initialName=tabLinks.some(function(t){return t.dataset.tab===location.hash.slice(1)})
-    ? location.hash.slice(1) : 'architecture';
-  shown=null;
-  markTab(initialName);
-  items.forEach(function(li){li.hidden=true});
-  list.style.height='0px';
-  window.setTimeout(function(){
-    if(shown===null)show(initialName);
-  },1500);
+  // Keep the list hidden during the page intro, then open the first tab
+  var initialName=tabLinks.some(function(t){return t.dataset.tab===location.hash.slice(1)})?location.hash.slice(1):tabLinks[0].dataset.tab;
+  markTab(initialName);align();
+  window.setTimeout(function(){if(current===null)show(initialName)},1500);
   window.addEventListener('resize',align);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(align);
   tabLinks.forEach(function(t,index){
