@@ -7,7 +7,8 @@
   document.documentElement.style.setProperty('--bg',p.color);
   var meta=document.querySelector('meta[name="theme-color"]');
   if(meta)meta.setAttribute('content',p.color);
-  document.title=p.name.replace(/\b\w/g,function(c){return c.toUpperCase()})+' \u2014 Boxed In Studio';
+  // Capitalise the first letter of each word (works for apostrophes and macrons: "harry's m\u0101ori whare" -> "Harry's M\u0101ori Whare")
+  document.title=p.name.replace(/(^|\s)\S/g,function(c){return c.toUpperCase()})+' \u2014 Boxed In Studio';
 
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
 
@@ -33,10 +34,14 @@
         var src=typeof im==='string'?im:im.src;
         var alt=(typeof im==='object'&&im.alt)||(p.name+' \u2013 image '+(i+1));
         var f=el('figure'),img=document.createElement('img');
-        img.src=src;img.alt=alt;img.decoding='async';if(i>0)img.loading='lazy';
+        img.alt=alt;img.decoding='async';if(i>0)img.loading='lazy';
+        // Optional w and h (the photo's pixel size) let the browser keep the space free while the photo loads
+        if(typeof im==='object'&&im.w&&im.h){img.width=im.w;img.height=im.h}
         img.addEventListener('load',function(){img.classList.add('in')});
+        // A photo that can't be found is left out instead of leaving an empty gap
+        img.addEventListener('error',function(){f.remove()});
+        img.src=src;
         f.appendChild(img);g.appendChild(f);
-        if(img.complete)img.classList.add('in');
       });
     }else{
       for(var i=0;i<4;i++)g.appendChild(el('figure','ph','image'));

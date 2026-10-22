@@ -24,6 +24,9 @@
     images       a list of photo files, e.g.  images:["images/carpentry-3-1.jpg", "images/carpentry-3-2.jpg"]
                  Put the photos in an "images" folder in your repo. Leave it as [] to show grey placeholders.
                  To set the description of a photo for screen readers, use {src:"images/x.jpg", alt:"Describe it"}.
+                 Add the photo's size in pixels as well and the page won't jump while it loads:
+                 {src:"images/x.jpg", alt:"Describe it", w:1920, h:1080}
+                 Tip: export photos about 1700px wide (JPEG, quality ~80). Straight-from-camera files are far too heavy.
 
   Note on colours: Safari's top bar turns grey for very light colours, so
   keep colours mid-to-dark.
