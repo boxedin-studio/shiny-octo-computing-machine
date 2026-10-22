@@ -51,43 +51,15 @@ html{overflow-x:hidden;background:var(--bg)}
 .projects.drop-close .project-letter{animation:letter-lift var(--letter-duration) cubic-bezier(.4,0,.8,.4) both;animation-delay:var(--letter-delay,0ms)}
 @keyframes letter-drop{from{opacity:0;transform:translateY(-.7em)}to{opacity:1;transform:translateY(0)}}
 @keyframes letter-lift{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-.7em)}}
-@media (prefers-reduced-motion:reduce){body,a{:none}.page,.project-letter{animation:none!important}.projects{:none!important}}
+@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.project-letter{animation:none!important}.projects{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="page">
   <a class="logo" href="index.html" aria-label="Boxed In home"></a>
   <div class="top">
-    <nav class="tabs" id="tabs" role="tablist" aria-label="Project categories">
-      <a href="#architecture" data-tab="architecture" role="tab" aria-controls="projects">architecture</a>
-      <a href="#carpentry" data-tab="carpentry" role="tab" aria-controls="projects">carpentry</a>
-    </nav>
-    <ul class="projects" id="projects" role="tabpanel">
-      <!-- ARCHITECTURE -->
-      <li data-tab="architecture"><a href="whananaki-residence.html" data-bg="#56704f">whananaki residence</a></li>
-      <li data-tab="architecture"><a href="mangawhai-house.html" data-bg="#7d7562">mangawhai house</a></li>
-      <li data-tab="architecture"><a href="piha-bach.html" data-bg="#9a5b3a">piha bach</a></li>
-      <li data-tab="architecture"><a href="waiheke-studio.html" data-bg="#667378">waiheke studio</a></li>
-      <li data-tab="architecture"><a href="karekare-cabin.html" data-bg="#7c7a45">karekare cabin</a></li>
-      <!-- CARPENTRY -->
-      <li data-tab="carpentry"><a href="ply-table.html" data-bg="#867350">ply table</a></li>
-      <li data-tab="carpentry"><a href="totara-desktop.html" data-bg="#8c5e49">totara desktop</a></li>
-      <li data-tab="carpentry"><a href="chopping-board.html" data-bg="#435c4a">chopping board</a></li>
-      <li data-tab="carpentry"><a href="misc-carpentry.html" data-bg="#8b733d">misc carpentry</a></li>
-      <li data-tab="carpentry"><a href="oak-bench.html" data-bg="#585d5c">oak bench</a></li>
-      <li data-tab="carpentry"><a href="kauri-shelving.html" data-bg="#a0623f">kauri shelving</a></li>
-      <li data-tab="carpentry"><a href="macrocarpa-stool.html" data-bg="#6a7a64">macrocarpa stool</a></li>
-      <li data-tab="carpentry"><a href="walnut-side-table.html" data-bg="#5a4234">walnut side table</a></li>
-      <!-- HIDDEN PLACEHOLDERS (not shown on the site).
-           To add a project, delete the comment markers at the start and end of its line,
-           then change the name, the link (the .html file) and, if you like, the colour. -->
-      <!-- <li data-tab="architecture"><a href="project-name-a.html" data-bg="#7a5c46">project name</a></li> -->
-      <!-- <li data-tab="architecture"><a href="project-name-b.html" data-bg="#4d5f58">project name</a></li> -->
-      <!-- <li data-tab="architecture"><a href="project-name-c.html" data-bg="#a58b5a">project name</a></li> -->
-      <!-- <li data-tab="carpentry"><a href="project-name-d.html" data-bg="#6b6f4a">project name</a></li> -->
-      <!-- <li data-tab="carpentry"><a href="project-name-e.html" data-bg="#8a4a3c">project name</a></li> -->
-      <!-- <li data-tab="carpentry"><a href="project-name-f.html" data-bg="#7a7468">project name</a></li> -->
-    </ul>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Project categories"></nav>
+    <ul class="projects" id="projects" role="tabpanel"></ul>
   </div>
   <ul class="info">
     <li><a href="#">archive</a></li>
@@ -97,6 +69,15 @@ html{overflow-x:hidden;background:var(--bg)}
     <li><a href="mailto:harry@boxedin.studio"><strong>harry@boxedin.studio</strong></a></li>
   </ul>
 </div>
+<script src="projects.js"></script>
+<script>
+(function(){
+  var S=window.SITE||{mediums:[],projects:[]};
+  var tabs=document.getElementById('tabs'),list=document.getElementById('projects');
+  S.mediums.forEach(function(m){var a=document.createElement('a');a.href='#'+m.id;a.dataset.tab=m.id;a.setAttribute('role','tab');a.setAttribute('aria-controls','projects');a.textContent=m.label;tabs.appendChild(a)});
+  S.projects.forEach(function(p){var li=document.createElement('li');li.dataset.tab=p.medium;var a=document.createElement('a');a.href=p.id+'.html';a.dataset.bg=p.color;a.textContent=p.name;li.appendChild(a);list.appendChild(li)});
+})();
+</script>
 <script>
 (function(){
   var root=document.documentElement;
