@@ -24,6 +24,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .desc{max-width:46ch;font-weight:400;text-transform:none;font-size:1.1em;line-height:1.4}
 .desc p{margin:0 0 1em}
 .desc p:last-child{margin-bottom:0}
+.desc a{text-decoration:underline}
 .details{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 24px;max-width:900px}
 .details div{display:grid;gap:2px}
 .details dt{opacity:.6}
@@ -34,10 +35,11 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .gallery figure:nth-child(3n+1){grid-column:1/-1}
 .gallery figure:not(:nth-child(3n+1)){aspect-ratio:1/1;overflow:hidden}
 .gallery figure:not(:nth-child(3n+1)) img{height:100%;object-fit:cover}
-.gallery img{display:block;width:100%;height:auto;opacity:0;transition:opacity .6s ease}
-.gallery img.in{opacity:1}
+.gallery img{display:block;width:100%;height:auto;opacity:1;transition:opacity .6s ease}
+.gallery img.loading{opacity:0}
 .gallery .ph{aspect-ratio:1/1;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;opacity:.8}
 .gallery .ph:nth-child(3n+1){aspect-ratio:16/9}
+.gallery .ph::after{content:"image"}
 .pager{display:flex;justify-content:space-between;gap:24px;margin-top:clamp(16px,4vh,48px)}
 .pager a{display:grid;gap:2px;padding:4px 0}
 .pager .next{text-align:right;margin-left:auto}

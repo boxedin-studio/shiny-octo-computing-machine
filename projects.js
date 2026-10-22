@@ -3,13 +3,16 @@
   YOUR PROJECTS  -  this is the only file you need to edit to change the menu
   ==========================================================================
 
+  After you change anything here, ask Claude to rebuild the site (it runs build.js).
+  The build writes every page from this file, so names, descriptions and photos
+  reach the real pages, search engines and link previews.
+
   RENAME a project:   change its  name  (the page file name never changes).
   RECOLOUR a project: change its  color  (keep colours fairly dark, see note below).
   REORDER projects:   move the lines up or down (they show in this order).
   REMOVE a project:   delete its line, or put // in front of it to hide it for now.
-  ADD a project:      copy a line, give it the next number for its medium
-                      (e.g. architecture-6) and make a page with the same name
-                      (copy any project page and rename it architecture-6.html).
+  ADD a project:      copy a line and give it the next number for its medium
+                      (e.g. architecture-6). Its page is created by the build.
   ADD a new medium:   add a line to "mediums" (e.g. {id:"furniture", label:"furniture"}),
                       then use  medium:"furniture"  and ids like furniture-1 on its projects.
                       A new tab appears automatically.
@@ -18,7 +21,10 @@
   The id is only the file name; the visible name is "name" below.
 
   EACH PROJECT can have:
-    description  the text under the title (leave a blank line for a new paragraph)
+    place        (optional) where it is, e.g. "Whangarei". Added to the page title for search.
+    description  the text under the title (leave a blank line for a new paragraph).
+                 The first sentence or two is also what Google and link previews show,
+                 so say what it is, the materials, and where.
     details      a list of label/value pairs, any labels you like, different for each project:
                  [["year","2025"],["location","Whananaki"]]  or  [["materials","Macrocarpa"],["price","$450"]]
     images       a list of photo files, e.g.  images:["images/carpentry-3-1.jpg", "images/carpentry-3-2.jpg"]
@@ -97,7 +103,7 @@ window.SITE = {
 
     // ---- READY TO USE (hidden for now) ----
     // To show one, delete the // at the start of each of its lines, then set its name.
-    // Their pages (architecture-6.html and so on) already exist.
+    // Their pages are created when you rebuild the site.
     // {id:"architecture-6", medium:"architecture", name:"project name", color:"#7a5c46",
     //  description:"Short description of the project goes here. A sentence or two about what it is and what makes it special.",
     //  details:[["year","0000"],["location","location"],["type","type"]],
