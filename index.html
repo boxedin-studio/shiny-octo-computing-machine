@@ -48,17 +48,17 @@ html{overflow-x:hidden;background:var(--bg)}
 
 /*
   PROJECT-LIST ANIMATION (rows fade and drop in one after another; the old list fades out at the same time)
-  Open: --row-in-step is the delay between rows, --row-in-time is how long each row takes.
-  Close: --row-out-step and --row-out-time. Keep the numbers in the script (rowOutStep, rowOutTime) the same as the CSS ones.
+  Close: the old list fades out at once (--row-out-time), without moving, so its words clear before the new ones appear.
+  Open: after --open-delay, rows drop in --row-in-step apart, each taking --row-in-time. Keep the numbers in the script (rowOutStep, rowOutTime) the same as the CSS ones.
 */
-:root{--row-in-step:70ms;--row-in-time:500ms;--row-out-step:40ms;--row-out-time:350ms}
+:root{--open-delay:110ms;--row-in-step:35ms;--row-in-time:300ms;--row-out-step:0ms;--row-out-time:150ms}
 .group{grid-area:1/1;list-style:none;margin:0;padding:0;visibility:hidden;pointer-events:none}
 .group.open{visibility:visible;pointer-events:auto}
 .group.closing{pointer-events:none}
-.group.opening li{animation:row-in var(--row-in-time) cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*var(--row-in-step))}
-.group.closing li{animation:row-out var(--row-out-time) cubic-bezier(.4,0,.8,.4) both;animation-delay:calc(var(--i)*var(--row-out-step))}
+.group.opening li{animation:row-in var(--row-in-time) cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--open-delay) + var(--i)*var(--row-in-step))}
+.group.closing li{animation:row-out var(--row-out-time) linear both;animation-delay:calc(var(--i)*var(--row-out-step))}
 @keyframes row-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-@keyframes row-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-8px)}}
+@keyframes row-out{from{opacity:1}to{opacity:0}}
 @media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.group li{animation:none!important}}
 </style>
 </head>
@@ -124,7 +124,7 @@ html{overflow-x:hidden;background:var(--bg)}
   var groups={};
   Array.prototype.forEach.call(list.querySelectorAll('.group'),function(g){groups[g.dataset.tab]=g});
   var current=null;
-  var rowOutStep=40,rowOutTime=350; // keep the same as --row-out-step and --row-out-time in the CSS
+  var rowOutStep=0,rowOutTime=150; // keep the same as --row-out-step and --row-out-time in the CSS
   function markTab(name){tabLinks.forEach(function(t){var on=t.dataset.tab===name;t.classList.toggle('current',on);t.setAttribute('aria-selected',on?'true':'false');t.setAttribute('tabindex',on?'0':'-1')})}
   // Line each list up under its own tab, and size the block to the open list
   function align(){
