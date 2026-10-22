@@ -93,7 +93,7 @@ window.SITE = {
 
     // ---- carpentry ----
     {id:"carpentry-1", medium:"carpentry", name:"ply table", color:"#4d8750",
-     description:"Designed and crafted to host the masses, this plywood table is durable and aesthetic. Its 38mm profile makes it feel weighty to the touch giving it a robust feel, yet the scale and length makes it appear light and modern. Keeping its natural finish, it is coated in a polyurethane finish so it can withstand bumps and scrapes, and heavy damage can be sanded back and recoated with ease and no difference to its appearance.",
+     description:"Designed and crafted to host the masses, this plywood table is both durable and aesthetic. Its 38mm profile makes it feel weighty to the touch giving it a robust feel, yet the scale and length makes it appear light and perfect for seating large crowds. Keeping its natural finish, it is coated in a polyurethane so it can withstand bumps and scrapes. Heavy damage can be sanded back and recoated easily with no difference to its appearance.",
      details:[["year","2026"],["materials","19mm Radiata Plywood"],["price","$800"]],
      images:[
        {src:"ply-table/ply-table-01-benches.jpg", alt:"Finished ply table with two matching benches in a bright dining nook", focus:"50% 55%"},
