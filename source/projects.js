@@ -34,13 +34,29 @@
        the first number is left-to-right, the second is top-to-bottom (50% 50% is the centre, "50% 0%" the top).
     3. Ask Claude to rebuild. The site makes a small fast copy for the page and a large copy for when someone
        clicks the photo (which shows the whole photo, uncropped).
-    The layout repeats in threes: 1st cell landscape, 2nd and 3rd square. Any photo is cropped to fit its cell.
+    The layout repeats in threes: 1st cell landscape (16:9, like 1920x1080), 2nd and 3rd square. Any photo is cropped to fit its cell.
     A photo's EXIF data (including GPS location) is not copied into the website's versions.
+
+  DRAWINGS (SVG from Illustrator)
+    1. Save the drawing as an SVG into  source/drawings/<project-folder>/  (Illustrator: File > Save As > SVG,
+       Styling "Internal CSS", Fonts "Convert to outline", and keep a viewBox / "Responsive" ticked).
+    2. List it among the images, in the cell where you want it:
+         {drawing:"ply-table/exploded.svg", alt:"Describe the drawing for screen readers"}
+       (Text left as live text in the drawing, in any Aileron weight, shows in the website's Aileron.)
+    Draw in black on white as normal. The site turns black into the page's text colour and white into the page
+    colour (greys become tones in between), so a drawing always matches the project it sits in. White shapes
+    are handy for hiding the lines behind them. Other colours are turned into tones as well.
+    A drawing is shown whole (never cropped) in its cell, so use a 16:9 artboard in a landscape cell
+    and a square artboard in a square cell. Lines keep the same thickness at every screen size.
 
   TEXT IN THE GRID
     A text block takes the place of a photo and fills that cell's shape (keep it short, a few lines):
          {title:"Materials", text:"Pine structural plywood, 25mm top."}
-    Leave a blank line inside the text for a new paragraph.
+    Leave a blank line inside the text for a new paragraph, or write \n for a new line.
+    A text block can also have a small legend at its bottom, in ultra light type. Use it to explain the numbers
+    drawn in the drawing beside it:
+         {title:"About", text:"A short note.", legend:["First part", "Second part"]}
+    The two square cells always sit side by side, even on a phone, so keep text blocks short (about 100 characters).
 
   Note on colours: Safari's top bar turns grey for very light colours, so
   keep colours mid-to-dark.
@@ -81,14 +97,16 @@ window.SITE = {
      details:[["year","0000"],["materials","materials"],["price","$0"]],
      images:[
        {src:"ply-table/ply-table-01-benches.jpg", alt:"Finished ply table with two matching benches in a bright dining nook", focus:"50% 55%"},
-       {src:"ply-table/ply-table-02-front.jpg", alt:"Front view of the table and benches", focus:"50% 60%"},
-       {title:"Materials", text:"Short note about the materials goes here. A sentence or two."},
+       {drawing:"ply-table/exploded-table.svg", alt:"Exploded diagram of the table: the plywood top lifted above two trapezoid leg frames, with the rail drawn out to the front"},
+       {title:"About", text:"Short note about the project goes here.",
+        legend:["36mm Radiata Ply Tabletop, (2 x 18mm ply, laminated)", "Solid-cut legs, same material", "Bracing, same material"]},
        {src:"ply-table/ply-table-03-underneath.jpg", alt:"Looking up at the angled legs from floor level", focus:"50% 45%"},
-       {src:"ply-table/ply-table-04-grain.jpg", alt:"Close-up of the plywood top grain", focus:"50% 40%"},
-       {src:"ply-table/ply-table-05-edge.jpg", alt:"Layered plywood edge and angled leg", focus:"50% 40%"},
+       {drawing:"ply-table/exploded-bench.svg", alt:"Exploded diagram of a bench: the plywood top lifted above two rectangular end frames, with the rail drawn out to the front"},
+       {title:"Benches", text:"Short note about the benches goes here.",
+        legend:["Bench top", "End frames", "Rail"]},
        {src:"ply-table/ply-table-06-outdoors.jpg", alt:"Table outdoors in sunlight during assembly", focus:"50% 62%"},
-       {title:"Making", text:"Short note about how it was made goes here. A sentence or two."},
-       {src:"ply-table/ply-table-07-chairs.jpg", alt:"Table beside the window with velvet chairs", focus:"50% 70%"}
+       {src:"ply-table/ply-table-04-grain.jpg", alt:"Close-up of the plywood top grain", focus:"50% 40%"},
+       {src:"ply-table/ply-table-05-edge.jpg", alt:"Layered plywood edge and angled leg", focus:"50% 40%"}
      ]},
     {id:"carpentry-2", medium:"carpentry", name:"totara desktop", color:"#8c5e49",
      description:"Short description of the project goes here. A sentence or two about what it is and what makes it special.",

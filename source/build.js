@@ -21,8 +21,8 @@ const SITE_URL = 'https://boxedin.studio';
 const STATIC_PAGES = ['archive', 'studio', 'journal'];           // hand-written pages (folders in the main folder)
 const PLACEHOLDER = /Short description of the project goes here/;
 // Photo shapes. In each group of three cells the 1st is landscape, the 2nd and 3rd are squares.
-// (If you change the landscape ratio here, change the 3/2 for .gallery figure:nth-child(3n+1) in assets/css/project.css too.)
-const LANDSCAPE = 3 / 2;
+// (If you change the landscape ratio here, change the 16/9 for .gallery figure:nth-child(3n+1) in assets/css/project.css too.)
+const LANDSCAPE = 16 / 9;
 const WIDTHS = { L: [900, 1720], S: [480, 900] };               // sizes made for the page (phones get the smaller one)
 const FULL_MAX = 2400;                                           // the enlarged view: longest side in pixels
 
@@ -118,6 +118,78 @@ async function makePhoto(p, im, shape) {
   return { thumbs, full };
 }
 
+
+// ---- drawings (SVG made in Illustrator) -----------------------------------
+// Drawn in black on white as usual; the site turns black into the page's text colour and white into the page colour
+// (greys become in-between tones), so a drawing always matches the project it sits in.
+let drawingCount = 0;
+function toneOf(value) {                         // returns replacement CSS for a colour, or null to leave it alone
+  let v = String(value).trim().toLowerCase(), r, g, b;
+  if (!v || /^(none|transparent|inherit|currentcolor|url\(|var\()/.test(v)) return null;
+  let m;
+  if ((m = v.match(/^#([0-9a-f]{3})$/))) { r = parseInt(m[1][0] + m[1][0], 16); g = parseInt(m[1][1] + m[1][1], 16); b = parseInt(m[1][2] + m[1][2], 16); }
+  else if ((m = v.match(/^#([0-9a-f]{6})/))) { r = parseInt(m[1].slice(0, 2), 16); g = parseInt(m[1].slice(2, 4), 16); b = parseInt(m[1].slice(4, 6), 16); }
+  else if ((m = v.match(/^rgba?\(\s*([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)/))) { r = +m[1]; g = +m[2]; b = +m[3]; }
+  else if (v === 'black') { r = g = b = 0; } else if (v === 'white') { r = g = b = 255; }
+  else if (v === 'gray' || v === 'grey') { r = g = b = 128; }
+  else return null;
+  const ink = 1 - (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (ink >= 0.97) return 'currentColor';
+  if (ink <= 0.03) return 'var(--bg)';
+  return 'color-mix(in srgb, currentColor ' + Math.round(ink * 100) + '%, var(--bg))';
+}
+const COLOUR_PROPS = 'fill|stroke|stop-color|color|flood-color';
+function normaliseFonts(css) {                    // any Aileron-... name from Illustrator becomes the site's Aileron
+  return css.replace(/font-family\s*:\s*([^;}"]+)/g, (all, val) => {
+    if (!/aileron/i.test(val)) return all;
+    const w = /black|heavy/i.test(val) ? 800 : /semi-?bold/i.test(val) ? 600 : /bold/i.test(val) ? 700 : /ultra-?light|thin/i.test(val) ? 300 : /light/i.test(val) ? 300 : 400;
+    return 'font-family:Aileron,"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:' + w;
+  });
+}
+function mapColoursInCss(css) {
+  css = normaliseFonts(css);
+  return css.replace(new RegExp('(^|[;{\\s])(' + COLOUR_PROPS + ')\\s*:\\s*([^;}"]+)', 'g'), (all, pre, prop, val) => {
+    const t = toneOf(val); return t ? pre + prop + ':' + t : all;
+  });
+}
+function inlineDrawing(p, im, n) {
+  const file = path.join(SRC, 'drawings', im.drawing);
+  if (!fs.existsSync(file)) { photoNotes.push(p.name + ': drawing not found, left out: source/drawings/' + im.drawing); return null; }
+  let svg = fs.readFileSync(file, 'utf8');
+  const k = 'd' + (++drawingCount) + '-' + slugify(p.slug).slice(0, 12);
+  svg = svg.replace(/<\?xml[\s\S]*?\?>/g, '').replace(/<!DOCTYPE[\s\S]*?>/gi, '').replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<(metadata|title|desc|script|foreignObject)[\s\S]*?<\/\1>/gi, '').replace(/<(script|image)[^>]*\/>/gi, '')
+    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*')/gi, '').replace(/\s(xlink:)?href\s*=\s*"(?!#)[^"]*"/gi, '');
+  // keep class names and ids unique to this drawing, so two drawings on one page cannot affect each other
+  const ids = new Set(); svg.replace(/\sid="([^"]*)"/g, (_, i) => ids.add(i));
+  const classes = new Set(); svg.replace(/\.([A-Za-z_][\w-]*)\s*[{,.:]/g, (_, c) => classes.add(c));
+  svg = svg.replace(/class="([^"]*)"/g, (_, c) => 'class="' + c.split(/\s+/).map(x => classes.has(x) ? k + '-' + x : x).join(' ') + '"');
+  svg = svg.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi, (_, a, css, z) => {
+    css = css.replace(/\.([A-Za-z_][\w-]*)/g, (m, c) => classes.has(c) ? '.' + k + '-' + c : m);
+    css = css.replace(/#([A-Za-z_][\w-]*)/g, (m, id) => ids.has(id) ? '#' + k + '-' + id : m);
+    return a + mapColoursInCss(css) + z;
+  });
+  svg = svg.replace(/\sid="([^"]*)"/g, ' id="' + k + '-$1"').replace(/url\(#([^)]+)\)/g, 'url(#' + k + '-$1)').replace(/href="#([^"]+)"/g, 'href="#' + k + '-$1"');
+  // colours written directly on shapes (fill="#000" and style="...") become tones of the text and page colours
+  svg = svg.replace(/<([a-zA-Z][\w:-]*)((?:\s[^<>]*?)?)(\/?)>/g, (all, tag, attrs, close) => {
+    if (/^(svg|style|\/)/i.test(tag) && tag.toLowerCase() !== 'svg') return all;
+    let style = ''; const m = attrs.match(/\sstyle="([^"]*)"/); if (m) { style = mapColoursInCss(m[1]); attrs = attrs.replace(m[0], ''); }
+    attrs = attrs.replace(/\sfont-family="([^"]*)"/, (a, val) => { if (!/aileron/i.test(val)) return a; style += (style && !style.endsWith(';') ? ';' : '') + normaliseFonts('font-family:' + val); return ''; });
+    attrs = attrs.replace(new RegExp('\\s(' + COLOUR_PROPS + ')="([^"]*)"', 'g'), (a, prop, val) => { const t = toneOf(val); if (t) { style += (style && !style.endsWith(';') ? ';' : '') + prop + ':' + t; return ''; } return a; });
+    return '<' + tag + attrs + (style ? ' style="' + style + '"' : '') + close + '>';
+  });
+  const root = svg.match(/<svg\b[^>]*>/i);
+  if (!root) { photoNotes.push(p.name + ': ' + im.drawing + ' is not a valid SVG, left out'); return null; }
+  let tag = root[0], vb = tag.match(/viewBox="([^"]+)"/);
+  if (!vb) { const w = parseFloat((tag.match(/\swidth="([\d.]+)/) || [])[1]), h = parseFloat((tag.match(/\sheight="([\d.]+)/) || [])[1]); if (w && h) vb = [null, '0 0 ' + w + ' ' + h]; }
+  if (!vb) { photoNotes.push(p.name + ': ' + im.drawing + ' has no viewBox or size, left out'); return null; }
+  const alt = im.alt || (titleCase(p.name) + ' – drawing ' + n);
+  const clean = tag.replace(/\s(width|height|viewBox|preserveAspectRatio|role|aria-label|style|x|y|id|version|enable-background)="[^"]*"/g, '').replace(/\sxmlns:xlink="[^"]*"/, '');
+  const newTag = clean.replace(/<svg/, '<svg role="img" aria-label="' + esc(alt) + '" viewBox="' + vb[1] + '" preserveAspectRatio="xMidYMid meet" focusable="false"');
+  svg = svg.replace(tag, newTag).replace(/>\s+</g, '><').trim();
+  return '      <figure class="drw">' + svg + '</figure>';
+}
+
 // ---- gallery and page body -----------------------------------------------
 async function bodyFor(p, base) {
   const out = [];
@@ -129,10 +201,14 @@ async function bodyFor(p, base) {
   for (const im of items) {
     const shape = cell % 3 === 0 ? 'L' : 'S';
     if (isText(im)) {
-      const body = String(im.text || '').split(/\n\s*\n/).map(t => t.trim()).filter(Boolean).map(t => '<p>' + esc(t) + '</p>').join('');
-      figs.push(`      <figure class="txt"><div>${im.title ? '<h2>' + esc(im.title) + '</h2>' : ''}${body}</div></figure>`);
+      const body = String(im.text || '').split(/\n\s*\n/).map(t => t.trim()).filter(Boolean).map(t => '<p>' + esc(t).replace(/\n/g, '<br>') + '</p>').join('');
+      const legend = (Array.isArray(im.legend) ? im.legend : String(im.legend || '').split(/\n/)).map(t => String(t).trim()).filter(Boolean);
+      const total = String(im.text || '').length + legend.join('').length;
+      if (total > 230) photoNotes.push(p.name + ': the text block "' + (im.title || '') + '" is long (' + total + ' characters) and may not fit its square cell');
+      figs.push(`      <figure class="txt"><div class="t">${im.title ? '<h2>' + esc(im.title) + '</h2>' : ''}${body}</div>${legend.length ? '<ol class="legend">' + legend.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>' : ''}</figure>`);
       cell++; continue;
     }
+    if (im.drawing) { const d = inlineDrawing(p, im, cell + 1); if (d) { figs.push(d); cell++; } continue; }
     const made = await makePhoto(p, im, shape);
     if (!made) continue;
     photoNo++; if (!im.alt) noAlt++;
