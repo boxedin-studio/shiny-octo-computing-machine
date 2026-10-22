@@ -1,0 +1,58 @@
+# Rebuilds the website pages whenever you change the things they are made from.
+# You edit source/projects.js (or photos, drawings, templates), commit and push; this does the rebuild
+# and commits the finished pages for you. Progress shows in the "Actions" tab on GitHub.
+name: Rebuild site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'source/projects.js'
+      - 'source/build.js'
+      - 'source/templates/**'
+      - 'source/photos/**'
+      - 'source/drawings/**'
+      - 'source/slugs.json'
+      - 'assets/css/project.css'
+  workflow_dispatch:        # lets you press "Run workflow" by hand in the Actions tab
+
+permissions:
+  contents: write           # to commit the rebuilt pages
+  pages: write              # to ask GitHub Pages to publish them
+
+concurrency:
+  group: rebuild-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the builder's tools
+        run: npm install --prefix source --no-package-lock --no-audit --no-fund
+      - name: Rebuild the pages
+        run: node source/build.js
+      - name: Commit the rebuilt pages
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing changed, so there is nothing to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Rebuild site from source"
+            git pull --rebase origin main
+            git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Ask GitHub Pages to publish
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages will publish on its own."

@@ -2,7 +2,7 @@
 
 The site for boxedin.studio. It is a plain set of web pages (no server, no database), hosted free on GitHub Pages.
 
-You do almost everything in **one file: `source/projects.js`**. Edit it, then ask Claude to rebuild the site, then commit and push in GitHub Desktop.
+You do almost everything in **one file: `source/projects.js`**. Edit it, then commit and push, then commit and push in GitHub Desktop.
 
 ---
 
@@ -10,11 +10,15 @@ You do almost everything in **one file: `source/projects.js`**. Edit it, then as
 
 1. Open `source/projects.js` in any text editor.
 2. Change what you want (examples below). Save.
-3. Ask Claude to **rebuild** (or run `node source/build.js` yourself). This turns your edits into the real pages.
-4. Open GitHub Desktop, tick the changed files (leave `.DS_Store` unticked), write a short message, **Commit**, then **Push**.
-5. Wait a minute or two, then refresh boxedin.studio.
+3. Open GitHub Desktop, tick the changed files (leave `.DS_Store` unticked), write a short message, **Commit**, then **Push**.
+4. GitHub rebuilds the pages for you (about a minute) and the site updates a minute or two after that. Refresh boxedin.studio.
+5. Before your next commit, click **Pull** in GitHub Desktop: the rebuild adds a commit of its own.
 
-> Never edit the files inside `projects/` or `index.html` by hand. The next rebuild replaces them.
+You can watch it happen in the **Actions** tab of the repo on github.com. A green tick means it worked; a red cross means something is wrong (a typo in `projects.js` is the usual cause; open the run to read the message, or ask Claude).
+
+The same rebuild runs automatically if you edit `projects.js` directly on github.com. It also runs when you change photos, drawings, templates or `assets/css/project.css`. You can also press **Run workflow** on the Actions tab to rebuild by hand.
+
+> Never edit the files inside `projects/` or `index.html` by hand. Each rebuild replaces them.
 
 ---
 
@@ -28,7 +32,7 @@ Every project has a `color`. It is that project's page background, and the home 
    {id:"carpentry-1", medium:"carpentry", name:"ply table", color:"#867350",
    ```
 3. Replace the six characters after `#` with your new colour. Pick one at https://htmlcolorcodes.com (use the "Hex" value). For example `color:"#3d6b5a"` is a deep green.
-4. Save, rebuild, commit and push (the quick recipe above).
+4. Save, then commit and push (the quick recipe above).
 
 Tips
 - Keep the quotes and the `#`. Six letters/numbers only (0-9, a-f).
@@ -69,7 +73,7 @@ The photo area is a grid that repeats in threes: **1st cell wide (16:9), 2nd and
    {src:"ply-table/ply-table-01.jpg", alt:"What the photo shows", focus:"50% 60%"}
    ```
    `focus` is optional: what stays in frame when the photo is cropped (left-to-right %, top-to-bottom %; `"50% 50%"` is the centre).
-3. Rebuild. Visitors see a small fast version; clicking opens the full photo.
+3. Commit and push. Visitors see a small fast version; clicking opens the full photo.
 
 **Drawing (SVG from Illustrator)**
 1. Save as SVG into `source/drawings/<project-name>/` (Illustrator: Styling "Internal CSS", Fonts "Convert to outline", keep Responsive ticked).
@@ -97,7 +101,7 @@ Keep it short (about 100 characters) so it fits a square. `legend` is optional (
 | Browser tab icon | `favicon.ico` and `assets/img/apple-touch-icon.png` |
 | Logo (changes colour with the text) | `assets/img/boxed-in-logo.svg` |
 
-After editing templates or `project.css`, rebuild too (the templates feed the generated pages).
+After editing templates or `project.css`, just commit and push: the rebuild runs on its own.
 
 ---
 
@@ -105,6 +109,7 @@ After editing templates or `project.css`, rebuild too (the templates feed the ge
 
 ```
 index.html            Home page (generated)
+.github/workflows/    The automatic rebuild instructions for GitHub
 404.html              "Page not found" and old-address forwarding (generated)
 sitemap.xml           Tells Google every page (generated)
 robots.txt            Search engine rules (generated)
@@ -119,7 +124,7 @@ assets/
   photos/             Resized photos made by the build (do not edit)
 source/
   projects.js         YOUR PROJECTS. The file you edit.
-  build.js            The builder
+  build.js            The builder (runs on GitHub each time you push)
   templates/          Page layouts
   photos/             Your original photos
   drawings/           Your original SVG drawings
@@ -134,6 +139,6 @@ All 16 Aileron styles are in `assets/fonts/`. The site uses Regular, Light, Ultr
 
 ## If something looks wrong
 
-- **Page did not change:** you probably forgot to rebuild, or to push.
-- **Build prints a warning:** it names the project and what is missing or too long.
+- **Page did not change:** check you pushed, then look at the Actions tab on github.com for a red cross.
+- **Build warning:** the run log on the Actions tab names the project and what is missing or too long.
 - **Stuck:** ask Claude; it can fix the file and rebuild.
