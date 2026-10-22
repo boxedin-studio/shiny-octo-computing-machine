@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://boxedin.studio/</loc></url>
-  <url><loc>https://boxedin.studio/studio.html</loc></url>
-  <url><loc>https://boxedin.studio/archive.html</loc></url>
-  <url><loc>https://boxedin.studio/journal.html</loc></url>
-  <url><loc>https://boxedin.studio/architecture-1.html</loc></url>
-  <url><loc>https://boxedin.studio/architecture-2.html</loc></url>
-  <url><loc>https://boxedin.studio/architecture-3.html</loc></url>
-  <url><loc>https://boxedin.studio/architecture-4.html</loc></url>
-  <url><loc>https://boxedin.studio/architecture-5.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-1.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-2.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-3.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-4.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-5.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-6.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-7.html</loc></url>
-  <url><loc>https://boxedin.studio/carpentry-8.html</loc></url>
+  <url><loc>https://boxedin.studio/archive/</loc></url>
+  <url><loc>https://boxedin.studio/studio/</loc></url>
+  <url><loc>https://boxedin.studio/journal/</loc></url>
+  <url><loc>https://boxedin.studio/projects/architecture/whananaki-residence/</loc></url>
+  <url><loc>https://boxedin.studio/projects/architecture/mangawhai-house/</loc></url>
+  <url><loc>https://boxedin.studio/projects/architecture/piha-bach/</loc></url>
+  <url><loc>https://boxedin.studio/projects/architecture/waiheke-studio/</loc></url>
+  <url><loc>https://boxedin.studio/projects/architecture/karekare-cabin/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/ply-table/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/totara-desktop/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/chopping-board/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/misc-carpentry/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/oak-bench/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/kauri-shelving/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/macrocarpa-stool/</loc></url>
+  <url><loc>https://boxedin.studio/projects/carpentry/walnut-side-table/</loc></url>
 </urlset>

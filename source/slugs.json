@@ -1,0 +1,54 @@
+{
+  "architecture-1": {
+    "current": "whananaki-residence",
+    "old": []
+  },
+  "architecture-2": {
+    "current": "mangawhai-house",
+    "old": []
+  },
+  "architecture-3": {
+    "current": "piha-bach",
+    "old": []
+  },
+  "architecture-4": {
+    "current": "waiheke-studio",
+    "old": []
+  },
+  "architecture-5": {
+    "current": "karekare-cabin",
+    "old": []
+  },
+  "carpentry-1": {
+    "current": "ply-table",
+    "old": []
+  },
+  "carpentry-2": {
+    "current": "totara-desktop",
+    "old": []
+  },
+  "carpentry-3": {
+    "current": "chopping-board",
+    "old": []
+  },
+  "carpentry-4": {
+    "current": "misc-carpentry",
+    "old": []
+  },
+  "carpentry-5": {
+    "current": "oak-bench",
+    "old": []
+  },
+  "carpentry-6": {
+    "current": "kauri-shelving",
+    "old": []
+  },
+  "carpentry-7": {
+    "current": "macrocarpa-stool",
+    "old": []
+  },
+  "carpentry-8": {
+    "current": "walnut-side-table",
+    "old": []
+  }
+}

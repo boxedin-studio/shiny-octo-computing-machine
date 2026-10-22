@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /_templates/
+Disallow: /source/
 
 Sitemap: https://boxedin.studio/sitemap.xml

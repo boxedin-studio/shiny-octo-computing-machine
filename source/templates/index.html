@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f4bff">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<title>Boxed In Studio</title>
+<meta name="description" content="Architecture and carpentry by Boxed In Studio.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Boxed In Studio">
+<meta property="og:title" content="Boxed In Studio">
+<meta property="og:description" content="Architecture and carpentry by Boxed In Studio.">
+<link rel="canonical" href="https://boxedin.studio/">
+<meta property="og:url" content="https://boxedin.studio/">
+<meta property="og:image" content="https://boxedin.studio/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+@font-face{font-family:"Aileron";font-weight:400;font-style:normal;font-display:swap;src:url(assets/fonts/aileron-regular.woff2) format("woff2")}
+@font-face{font-family:"Aileron";font-weight:700;font-style:normal;font-display:swap;src:url(assets/fonts/aileron-bold.woff2) format("woff2")}
+:root{--bg:#2f4bff;--fg:#ffffff;--pad:clamp(16px,2.2vw,32px);box-sizing:border-box}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:"Aileron","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:clamp(.875rem,1.9vh,1.25rem);line-height:1.25;letter-spacing:-.005em;text-transform:uppercase;font-weight:700;transition:color .4s ease-in-out}
+a{color:inherit;text-decoration:none;transition:opacity .35s ease}
+.page a:not(.logo){opacity:.6}
+.page a:not(.logo):hover,.page a:not(.logo):focus-visible,.page a.active,.page a.current{opacity:1}
+html.logo-fade .logo{opacity:.6}
+a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.page{position:relative;min-height:100vh;min-height:100svh;padding:calc(var(--pad) + env(safe-area-inset-top,0px)) var(--pad) calc(var(--pad) + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;justify-content:space-between;gap:48px;animation:pan-out .8s cubic-bezier(.16,.8,.24,1) .1s both}
+.top{display:flex;flex-direction:column;gap:20px}
+.tabs{display:flex;gap:1.5em}
+.tabs a{display:inline-block;padding:4px 0}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.projects{display:grid}
+.projects a{display:inline-block;padding:4px 0}
+.group-title{display:none}
+.info{list-style:none;margin:0;padding:0}
+.info a{display:inline-block;padding:1px 0}
+.logo{position:absolute;top:calc(var(--pad) + env(safe-area-inset-top,0px));right:var(--pad);width:312px;aspect-ratio:623.62/257.95;display:block;background-color:currentColor;-webkit-mask:url(assets/img/boxed-in-logo.svg) center/contain no-repeat;mask:url(assets/img/boxed-in-logo.svg) center/contain no-repeat}
+/* At narrower widths, move the logo into the page flow so it never overlaps the project list. */
+@media (max-width:900px){.page{justify-content:flex-start;gap:28px}.logo{position:static;order:-1;width:min(312px,70vw);align-self:flex-start}.info{margin-top:auto}}
+@media (max-width:623px){.logo{width:min(312px,100%);align-self:center}}
+html{overflow-x:hidden;background:var(--bg)}
+@keyframes pan-out{from{opacity:0;transform:scale(1.15)}to{opacity:1;transform:none}}
+/* Seen the intro already in this browser tab? Skip the zoom-out. */
+html.intro-seen .page{animation:none}
+
+/*
+  PROJECT-LIST ANIMATION (rows fade and drop in one after another; the old list fades out at the same time)
+  Close: the old list fades out at once (--row-out-time), without moving, so its words clear before the new ones appear.
+  Open: after --open-delay, rows drop in --row-in-step apart, each taking --row-in-time. Keep the numbers in the script (rowOutStep, rowOutTime) the same as the CSS ones.
+*/
+:root{--open-delay:110ms;--row-in-step:35ms;--row-in-time:300ms;--row-out-step:0ms;--row-out-time:150ms}
+.group{grid-area:1/1;list-style:none;margin:0;padding:0;visibility:hidden;pointer-events:none}
+.group.open{visibility:visible;pointer-events:auto}
+.group.closing{pointer-events:none}
+.group.opening li{animation:row-in var(--row-in-time) cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--open-delay) + var(--i)*var(--row-in-step))}
+.group.closing li{animation:row-out var(--row-out-time) linear both;animation-delay:calc(var(--i)*var(--row-out-step))}
+@keyframes row-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes row-out{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.group li{animation:none!important}}
+</style>
+<noscript><style>.tabs{display:none}.projects{display:block;height:auto!important}.group{visibility:visible;pointer-events:auto;margin-left:0!important}.group+.group{margin-top:20px}.group-title{display:block}</style></noscript>
+<script>try{if(sessionStorage.getItem("introSeen"))document.documentElement.className+=" intro-seen"}catch(e){}</script>
+</head>
+<body>
+<main class="page">
+  <h1 class="sr-only">Boxed In Studio – architecture and carpentry</h1>
+  <a class="logo" href="./" aria-label="Boxed In home"></a>
+  <div class="top">
+    <nav class="tabs" id="tabs" aria-label="Project categories">{{TABS}}</nav>
+    <div class="projects" id="projects">{{GROUPS}}</div>
+  </div>
+  <ul class="info">
+    <li><a href="archive/">archive</a></li>
+    <li><a href="studio/">studio</a></li>
+    <li><a href="journal/">journal</a></li>
+    <li><a href="tel:+642102963024"><strong>+64&nbsp;21&nbsp;029&nbsp;63024</strong></a></li>
+    <li><a href="mailto:harry@boxedin.studio"><strong>harry@boxedin.studio</strong></a></li>
+  </ul>
+</main>
+<script>
+(function(){
+  var root=document.documentElement;
+  var list=document.getElementById('projects');
+  var base={bg:getComputedStyle(root).getPropertyValue('--bg').trim()};
+  function parse(h){h=h.trim().replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return [0,2,4].map(function(i){return parseInt(h.substr(i,2),16)/255})}
+  function lin(c){return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4)}
+  function gam(c){return c<=.0031308?12.92*c:1.055*Math.pow(c,1/2.4)-.055}
+  function toLab(c){var r=lin(c[0]),g=lin(c[1]),b=lin(c[2]);var l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);return [.2104542553*l+.7936177850*m-.0040720468*s,1.9779984951*l-2.4285922050*m+.4505937099*s,.0259040371*l+.7827717662*m-.8086757660*s]}
+  function toHex(L){var l=L[0]+.3963377774*L[1]+.2158037573*L[2],m=L[0]-.1055613458*L[1]-.0638541728*L[2],s=L[0]-.0894841775*L[1]-1.2914855480*L[2];l=l*l*l;m=m*m*m;s=s*s*s;var c=[4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.7076147010*s];return '#'+c.map(function(v){v=Math.round(255*Math.min(1,Math.max(0,gam(Math.max(0,v)))));return (v<16?'0':'')+v.toString(16)}).join('')}
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var meta=document.querySelector('meta[name="theme-color"]');
+  // Keep Safari's theme colour in sync with the actual page colour.
+  function setBg(c){root.style.setProperty('--bg',c);document.body.style.backgroundColor=c;if(meta)meta.setAttribute('content',c)}
+  var curLab=toLab(parse(base.bg)),target=base.bg.toLowerCase(),raf=0;
+  function fadeTo(hex){hex=hex.toLowerCase();if(hex===target)return;target=hex;var A=curLab.slice(),B=toLab(parse(hex)),t0=null,dur=300;cancelAnimationFrame(raf);function paint(p){var e=-(Math.cos(Math.PI*p)-1)/2,k1=e<.5?1-2*e:0,k2=e<.5?0:2*e-1;curLab=[A[0]+(B[0]-A[0])*e,A[1]*k1+B[1]*k2,A[2]*k1+B[2]*k2];setBg(toHex(curLab))}if(reduce){curLab=B;setBg(hex);return}function step(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur);paint(p);if(p<1)raf=requestAnimationFrame(step);else setBg(hex)}raf=requestAnimationFrame(step)}
+  var active=null;
+  function set(bg,a){fadeTo(bg||base.bg);root.classList.toggle('logo-fade',!!(bg&&a));if(active)active.classList.remove('active');active=a||null;if(active)active.classList.add('active')}
+  list.querySelectorAll('a').forEach(function(a){var on=function(){set(a.dataset.bg,a)};a.addEventListener('mouseenter',on);a.addEventListener('focus',on);a.addEventListener('touchstart',on,{passive:true})});
+  var off=function(){set(base.bg,null)};
+  list.addEventListener('mouseleave',off);list.addEventListener('focusout',function(e){if(!list.contains(e.relatedTarget))off()});
+  var info=document.querySelector('.info');
+  info.querySelectorAll('a').forEach(function(a){var on=function(){set(null,a)};a.addEventListener('mouseenter',on);a.addEventListener('focus',on);a.addEventListener('touchstart',on,{passive:true})});
+  info.addEventListener('mouseleave',off);info.addEventListener('focusout',function(e){if(!info.contains(e.relatedTarget))off()});
+
+  var tabs=document.getElementById('tabs');
+  var tabLinks=Array.prototype.slice.call(tabs.querySelectorAll('a'));
+  var groups={};
+  Array.prototype.forEach.call(list.querySelectorAll('.group'),function(g){groups[g.dataset.tab]=g;g.setAttribute('aria-hidden','true')});
+  // The tab roles are added here, because without JavaScript these are plain links and the lists are all showing.
+  tabs.setAttribute('role','tablist');
+  tabLinks.forEach(function(t){t.setAttribute('role','tab');t.setAttribute('aria-controls','projects')});
+  var current=null;
+  var rowOutStep=0,rowOutTime=150; // keep the same as --row-out-step and --row-out-time in the CSS
+  function markTab(name){tabLinks.forEach(function(t){var on=t.dataset.tab===name;t.classList.toggle('current',on);t.setAttribute('aria-selected',on?'true':'false');t.setAttribute('tabindex',on?'0':'-1')})}
+  // Line each list up under its own tab, and size the block to the open list
+  function align(){
+    tabLinks.forEach(function(t){var g=groups[t.dataset.tab];if(g)g.style.marginLeft=Math.max(0,t.offsetLeft-list.offsetLeft)+'px'});
+    if(current&&groups[current])list.style.height=groups[current].offsetHeight+'px';
+  }
+  function openGroup(g){
+    clearTimeout(g._t);
+    g.classList.remove('closing','opening');void g.offsetWidth;
+    g.classList.add('open');
+    if(!reduce)g.classList.add('opening');
+    g.removeAttribute('aria-hidden');
+  }
+  function closeGroup(g){
+    if(!g.classList.contains('open')||g.classList.contains('closing'))return;
+    g.classList.remove('opening');
+    g.setAttribute('aria-hidden','true');
+    if(reduce){g.classList.remove('open');return}
+    g.classList.add('closing');
+    g._t=setTimeout(function(){g.classList.remove('open','closing')},(g.children.length-1)*rowOutStep+rowOutTime+40);
+  }
+  // Opening one list and closing the other happen at the same moment
+  function show(name){
+    if(!groups[name])name=tabLinks[0].dataset.tab;
+    if(name===current)return name;
+    current=name;markTab(name);
+    Object.keys(groups).forEach(function(k){if(k!==name)closeGroup(groups[k])});
+    openGroup(groups[name]);
+    align();
+    return name;
+  }
+  // Keep the list hidden during the page intro, then open the first tab.
+  // introListDelay = milliseconds after load on a first visit; repeat visits open at once.
+  var introListDelay=700,seen=root.classList.contains('intro-seen');
+  try{sessionStorage.setItem('introSeen','1')}catch(e){}
+  var initialName=tabLinks.some(function(t){return t.dataset.tab===location.hash.slice(1)})?location.hash.slice(1):tabLinks[0].dataset.tab;
+  markTab(initialName);align();
+  window.setTimeout(function(){if(current===null)show(initialName)},seen?0:introListDelay);
+  window.addEventListener('resize',align);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(align);
+  tabLinks.forEach(function(t,index){
+    var on=function(){set(null,t)};t.addEventListener('mouseenter',on);t.addEventListener('focus',on);t.addEventListener('touchstart',on,{passive:true});
+    t.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+show(t.dataset.tab))});
+    t.addEventListener('keydown',function(e){var nextIndex=null;if(e.key==='ArrowRight')nextIndex=(index+1)%tabLinks.length;else if(e.key==='ArrowLeft')nextIndex=(index+tabLinks.length-1)%tabLinks.length;else if(e.key==='Home')nextIndex=0;else if(e.key==='End')nextIndex=tabLinks.length-1;if(nextIndex!==null){e.preventDefault();tabLinks[nextIndex].focus();show(tabLinks[nextIndex].dataset.tab)}});
+  });
+  tabs.addEventListener('mouseleave',off);tabs.addEventListener('focusout',function(e){if(!tabs.contains(e.relatedTarget))off()});
+  window.addEventListener('hashchange',function(){var n=location.hash.slice(1);if(groups[n])show(n)});
+  // Coming back to the page with the Back button (phones keep it in memory): clear any hover/tap colour left behind
+  window.addEventListener('pageshow',function(e){if(e.persisted)off()});
+})();
+</script>
+</body>
+</html>

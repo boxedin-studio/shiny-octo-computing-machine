@@ -1,0 +1,6 @@
+{
+  "name": "boxed-in-studio-build",
+  "private": true,
+  "description": "Build step for boxedin.studio. Run: npm install, then node build.js",
+  "dependencies": { "sharp": "^0.35.5" }
+}

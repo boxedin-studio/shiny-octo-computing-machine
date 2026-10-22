@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2f4bff">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<title>Page not found — Boxed In Studio</title>
+<link rel="stylesheet" href="/assets/css/project.css">
+<script>
+/* Old and mistyped addresses are sent to the right page. The list is written by build.js. */
+(function(){
+  var map={"architecture-1":"/projects/architecture/whananaki-residence/","architecture-2":"/projects/architecture/mangawhai-house/","architecture-3":"/projects/architecture/piha-bach/","architecture-4":"/projects/architecture/waiheke-studio/","architecture-5":"/projects/architecture/karekare-cabin/","carpentry-1":"/projects/carpentry/ply-table/","carpentry-2":"/projects/carpentry/totara-desktop/","carpentry-3":"/projects/carpentry/chopping-board/","carpentry-4":"/projects/carpentry/misc-carpentry/","carpentry-5":"/projects/carpentry/oak-bench/","carpentry-6":"/projects/carpentry/kauri-shelving/","carpentry-7":"/projects/carpentry/macrocarpa-stool/","carpentry-8":"/projects/carpentry/walnut-side-table/","archive":"/archive/","studio":"/studio/","journal":"/journal/"};
+  var p=location.pathname.replace(/\/index\.html$/,'/').replace(/\.html$/,'').replace(/^\/+|\/+$/g,'');
+  var to=map[p];
+  if(!to){var m=p.match(/^projects(?:\/([^\/]+))?$/);if(m)to='/#'+(m[1]||'')}
+  if(to)location.replace(to.indexOf('#')>-1&&to.charAt(0)==='/'?to:to+location.hash);
+})();
+</script>
+</head>
+<body>
+<main class="page">
+  <a class="logo" href="/" aria-label="Boxed In home"></a>
+  <a class="back ul" href="/"><span>back to home</span></a>
+  <h1 class="project-title">page not found</h1>
+  <div id="project-body">
+    <div class="desc"><p>That page doesn't exist. Try the home page to find a project.</p></div>
+  </div>
+</main>
+</body>
+</html>
