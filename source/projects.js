@@ -92,8 +92,8 @@ window.SITE = {
      images:[]},
 
     // ---- carpentry ----
-    {id:"carpentry-1", medium:"carpentry", name:"ply table", color:"#867350",
-     description:"Short description of the project goes here. A sentence or two about what it is and what makes it special.",
+    {id:"carpentry-1", medium:"carpentry", name:"ply table", color:"#4d8750",
+     description:"Designed and crafted to host the masses, this plywood table is durable and aesthetic. Its 38mm profile makes it feel weighty to the touch giving it a robust feel, yet the scale and length makes it appear light and modern. Keeping its natrual finish, it is coated in a polyurethane finish so it can withstand bumps and scrapes, and heavy damage can be sanded back and recoated with ease and no difference to its appearance.",
      details:[["year","0000"],["materials","materials"],["price","$0"]],
      images:[
        {src:"ply-table/ply-table-01-benches.jpg", alt:"Finished ply table with two matching benches in a bright dining nook", focus:"50% 55%"},
