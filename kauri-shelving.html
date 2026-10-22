@@ -18,16 +18,19 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .page{position:relative;min-height:100svh;padding:calc(var(--pad) + env(safe-area-inset-top,0px)) var(--pad) calc(var(--pad) + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:clamp(40px,10vh,100px)}
 .logo{position:absolute;top:calc(var(--pad) + env(safe-area-inset-top,0px));right:var(--pad);width:min(312px,38vw);aspect-ratio:623.62/257.95;display:block;background-color:currentColor;-webkit-mask:url(boxed-in-logo.svg) center/contain no-repeat;mask:url(boxed-in-logo.svg) center/contain no-repeat}
 .back{display:inline-block;width:max-content;font-weight:400}
+.back span{position:relative;display:inline-block;padding-bottom:3px}
+.back span:after{content:"";position:absolute;left:0;bottom:0;height:1.5px;width:100%;background:currentColor;transform:scaleX(.25);transform-origin:left;transition:transform .45s ease}
+.back:hover span:after,.back:focus-visible span:after{transform:scaleX(1)}
 .project-title{margin:0;max-width:12ch;font-size:clamp(2rem,8vw,6rem);line-height:.98;font-weight:700;letter-spacing:-.045em}
 @media(max-width:900px){.page{gap:28px}.logo{position:static;order:-1;width:min(312px,70vw)}.project-title{margin-top:clamp(24px,8vh,80px)}}
 @media(max-width:623px){.logo{width:min(312px,100%);align-self:center}}
-@media(prefers-reduced-motion:reduce){a{transition:none}}
+@media(prefers-reduced-motion:reduce){a,.back span:after{transition:none}}
 </style>
 </head>
 <body>
 <main class="page">
   <a class="logo" href="index.html" aria-label="Boxed In home"></a>
-  <a class="back" href="index.html">← back to projects</a>
+  <a class="back" href="index.html"><span>back to projects</span></a>
   <h1 class="project-title">kauri shelving</h1>
 </main>
 </body>
