@@ -44,10 +44,13 @@
     body.appendChild(g);
 
     var sib=S.projects.filter(function(x){return x.medium===p.medium}),n=sib.length,k=sib.indexOf(p);
-    if(n>1){
-      var prev=sib[(k-1+n)%n],next=sib[(k+1)%n],nav=el('nav','pager');
+    var links=[];
+    if(k>0)links.push([sib[k-1],'previous','prev']);
+    if(k<n-1)links.push([sib[k+1],'next','next']);
+    if(links.length){
+      var nav=el('nav','pager');
       nav.setAttribute('aria-label','More '+p.medium+' projects');
-      [[prev,'previous','prev'],[next,'next','next']].forEach(function(x){
+      links.forEach(function(x){
         var a=el('a','ul '+x[2]);a.href=x[0].id+'.html';
         a.appendChild(el('small',null,x[1]));a.appendChild(el('span',null,x[0].name));
         nav.appendChild(a);
