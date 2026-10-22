@@ -20,6 +20,8 @@ The same rebuild runs automatically if you edit `projects.js` directly on github
 
 > Never edit the files inside `projects/` or `index.html` by hand. Each rebuild replaces them.
 
+> **Search engines:** a project that still has the placeholder description ("Short description of the project goes here...") is hidden from Google (`noindex`) and left out of the sitemap. As soon as you write a real description and push, it becomes visible to search engines automatically. The studio, archive and journal pages are not hidden: add real text to them before they matter for search.
+
 ---
 
 ## Change a project's colour

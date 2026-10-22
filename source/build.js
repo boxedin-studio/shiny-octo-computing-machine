@@ -9,7 +9,7 @@
     projects/<medium>/<project-name>/       one page per project, at a clean address such as /projects/carpentry/ply-table/
     assets/photos/<project-name>/           cropped and resized copies of your photos (your originals are never touched)
     404.html                                friendly "not found" page, which also forwards old addresses to the right page
-    sitemap.xml and robots.txt              so search engines can find every page
+    sitemap.xml and robots.txt              so search engines can find every page (projects with placeholder text are left out and marked noindex until you write a description)
 
   Do not edit the generated pages by hand: the next build replaces them.
   To change how pages look, edit source/templates/ and assets/css/project.css.
@@ -20,6 +20,7 @@ const SRC = __dirname, ROOT = path.join(SRC, '..');
 const SITE_URL = 'https://boxedin.studio';
 const STATIC_PAGES = ['archive', 'studio', 'journal'];           // hand-written pages (folders in the main folder)
 const PLACEHOLDER = /Short description of the project goes here/;
+const isPlaceholder = p => PLACEHOLDER.test(p.description || '');   // pages still using the placeholder text are hidden from search engines until you write a real description
 // Photo shapes. In each group of three cells the 1st is landscape, the 2nd and 3rd are squares.
 // (If you change the landscape ratio here, change the 16/9 for .gallery figure:nth-child(3n+1) in assets/css/project.css too.)
 const LANDSCAPE = 16 / 9;
@@ -247,7 +248,7 @@ async function bodyFor(p, base) {
     const base = '../../../';
     const body = await bodyFor(p, base);
     const todo = [];
-    if (PLACEHOLDER.test(p.description || '')) todo.push('description');
+    if (isPlaceholder(p)) todo.push('description (hidden from search engines until written)');
     if ((p.details || []).some(kv => ['0000', 'materials', 'location', 'type', '$0'].includes(kv[1]))) todo.push('details');
     if (!body.photos) todo.push('photos'); else if (body.noAlt) todo.push('photo descriptions (alt)');
     if (todo.length) warnings.push(p.name.padEnd(20) + ' still needs: ' + todo.join(', '));
@@ -255,7 +256,7 @@ async function bodyFor(p, base) {
     const firstPara = String(p.description || '').split(/\n\s*\n/)[0];
     const desc = shorten(firstPara && !PLACEHOLDER.test(firstPara) ? firstPara : titleCase(p.name) + ' by Boxed In Studio.', 155);
     writeRoot(p.path + 'index.html', withBanner(fill(projectTpl, {
-      BASE: base, MEDIUM: esc(p.medium), COLOR: esc(p.color), TITLE: esc(title), DESC_META: esc(desc), URL: SITE_URL + '/' + p.path,
+      BASE: base, MEDIUM: esc(p.medium), COLOR: esc(p.color), TITLE: esc(title), DESC_META: esc(desc), ROBOTS: isPlaceholder(p) ? '\n<meta name="robots" content="noindex, follow">' : '', URL: SITE_URL + '/' + p.path,
       OG_IMAGE: esc(body.ogImage || SITE_URL + '/assets/img/og-image.png'), NAME: esc(p.name), BODY: body.html
     })));
   }
@@ -285,7 +286,7 @@ async function bodyFor(p, base) {
   legacy.forEach(f => fs.unlinkSync(path.join(ROOT, f)));
 
   // ---- sitemap and robots ------------------------------------------------
-  const urls = ['', ...STATIC_PAGES.map(s => s + '/'), ...SITE.projects.map(p => p.path)].map(u => `  <url><loc>${SITE_URL}/${u}</loc></url>`).join('\n');
+  const urls = ['', ...STATIC_PAGES.map(s => s + '/'), ...SITE.projects.filter(p => !isPlaceholder(p)).map(p => p.path)].map(u => `  <url><loc>${SITE_URL}/${u}</loc></url>`).join('\n');
   writeRoot('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
   writeRoot('robots.txt', `User-agent: *\nAllow: /\nDisallow: /source/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
