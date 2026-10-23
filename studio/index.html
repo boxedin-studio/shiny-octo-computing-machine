@@ -18,6 +18,14 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../assets/css/project.css">
+<script type="module" src="../assets/js/model-viewer.min.js"></script>
+<style>
+/* Spinning rat at the foot of the page. Kept in this file so the shared stylesheet, and the rebuild it triggers, stay untouched. */
+.rat{margin:auto 0 0;display:grid;gap:8px;justify-items:start}
+.rat model-viewer{display:block;width:200px;max-width:100%;height:auto;aspect-ratio:16/9;background:transparent;--poster-color:transparent;--progress-bar-color:transparent}
+.rat model-viewer:focus-visible{outline:1.5px solid currentColor;outline-offset:4px}
+.rat figcaption{opacity:.75}
+</style>
 </head>
 <body>
 <main class="page">
@@ -34,6 +42,11 @@
       <div><dt>phone</dt><dd><a href="tel:+642102963024">+64&nbsp;21&nbsp;029&nbsp;63024</a></dd></div>
     </dl>
   </div>
+  <figure class="rat">
+    <model-viewer src="../assets/models/spinning-rat.glb" alt="A low-poly grey rat spinning on the spot" autoplay loading="lazy" camera-controls disable-zoom disable-pan touch-action="pan-y" interaction-prompt="none" camera-orbit="-20deg 74deg 0.8m" min-camera-orbit="auto auto 0.2m" field-of-view="26deg" camera-target="0m 0.06m 0m" environment-image="neutral" exposure="1.1" shadow-intensity="0.8" shadow-softness="1"></model-viewer>
+    <figcaption>horizontally spinning rat</figcaption>
+  </figure>
+  <script>if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('.rat model-viewer').removeAttribute('autoplay');</script>
 </main>
 </body>
 </html>
