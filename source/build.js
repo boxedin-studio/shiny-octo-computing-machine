@@ -19,7 +19,7 @@ const fs = require('fs'), path = require('path'), vm = require('vm'), crypto = r
 const SRC = __dirname, ROOT = path.join(SRC, '..');
 const SITE_URL = 'https://boxedin.studio';
 const STATIC_PAGES = ['archive', 'studio', 'journal'];           // hand-written pages (folders in the main folder)
-const PLACEHOLDER = /Short description of the project goes here/;
+const PLACEHOLDER = /Short description of the project goes here|^\s*coming soon/i;
 const isPlaceholder = p => PLACEHOLDER.test(p.description || '');   // pages still using the placeholder text are hidden from search engines until you write a real description
 // Photo shapes. In each group of three cells the 1st is landscape, the 2nd and 3rd are squares.
 // (If you change the landscape ratio here, change the 16/9 for .gallery figure:nth-child(3n+1) in assets/css/project.css too.)
