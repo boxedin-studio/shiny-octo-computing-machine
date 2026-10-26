@@ -11,7 +11,7 @@
 <script>
 /* Old and mistyped addresses are sent to the right page. The list is written by build.js. */
 (function(){
-  var map={"architecture-1":"/projects/architecture/whananaki-residence/","architecture-2":"/projects/architecture/mangawhai-house/","architecture-3":"/projects/architecture/piha-bach/","architecture-4":"/projects/architecture/waiheke-studio/","architecture-5":"/projects/architecture/karekare-cabin/","carpentry-1":"/projects/carpentry/ply-table/","carpentry-2":"/projects/carpentry/totara-desktop/","carpentry-3":"/projects/carpentry/chopping-board/","carpentry-4":"/projects/carpentry/misc-carpentry/","carpentry-5":"/projects/carpentry/oak-bench/","carpentry-6":"/projects/carpentry/kauri-shelving/","carpentry-7":"/projects/carpentry/macrocarpa-stool/","carpentry-8":"/projects/carpentry/walnut-side-table/","archive":"/archive/","studio":"/studio/","journal":"/journal/"};
+  var map={"architecture-1":"/projects/architecture/whananaki-residence/","architecture-2":"/projects/architecture/mangawhai-house/","carpentry-1":"/projects/carpentry/ply-table/","carpentry-2":"/projects/carpentry/totara-desktop/","carpentry-3":"/projects/carpentry/chopping-board/","carpentry-4":"/projects/carpentry/misc-carpentry/","carpentry-5":"/projects/carpentry/oak-bench/","archive":"/archive/","studio":"/studio/","journal":"/journal/"};
   var p=location.pathname.replace(/\/index\.html$/,'/').replace(/\.html$/,'').replace(/^\/+|\/+$/g,'');
   var to=map[p];
   if(!to){var m=p.match(/^projects(?:\/([^\/]+))?$/);if(m)to='/#'+(m[1]||'')}
