@@ -81,3 +81,43 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .gallery .legend li{margin:0 0 .25em}
 @container (max-width:150px){.gallery .txt p{display:none}.gallery .txt h2{margin-bottom:.8em}}
 @container (max-width:230px){.gallery .drw text{font-size:78px}}
+
+/* ---- Tidy layout: projects with layout:"tidy" in projects.js. Same grid; each text block sits beside its drawing,
+   the key has numbered badges, wide drawings run the full width with a caption, and phones get one column. ---- */
+.gallery.tidy{align-items:start}
+.gallery.tidy .txt{gap:1.4em}
+.gallery.tidy .txt h2{margin:0 0 .55em;font-size:clamp(13px,4.2cqw,17px)}
+.gallery.tidy .txt p{font-size:clamp(14px,4.5cqw,18px)}
+.gallery.tidy .legend{list-style:none;counter-reset:k;margin:0;padding:0;font-weight:300;font-size:clamp(12.5px,3.5cqw,14.5px);line-height:1.25}
+.gallery.tidy .legend li{counter-increment:k;display:grid;grid-template-columns:1.9em minmax(0,1fr);gap:.75em;align-items:center;margin:0 0 .4em;break-inside:avoid}
+.gallery.tidy .legend li::before{content:counter(k);display:grid;place-items:center;width:1.9em;height:1.9em;border:1.3px solid currentColor;border-radius:50%;font-size:.82em;font-weight:400;line-height:1}
+.gallery.tidy .drw .dw{position:relative;display:flex;flex-direction:column;width:100%}
+.gallery.tidy .drw svg{height:auto;max-height:100cqw;cursor:zoom-in}
+.gallery.tidy figure.drw.wide{display:block;aspect-ratio:auto}
+.gallery.tidy .drw.wide svg{max-height:none}
+.gallery.tidy .drw figcaption{display:flex;gap:1.2em;align-items:baseline;margin-top:14px;font-size:14px}
+.gallery.tidy .drw figcaption b{white-space:nowrap}
+.gallery.tidy .drw figcaption span{font-weight:300;text-transform:none;font-size:15px;line-height:1.35}
+.enl{align-self:flex-end;margin-top:8px;font:inherit;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:inherit;background:none;border:1px solid color-mix(in srgb,currentColor 55%,transparent);padding:5px 9px;opacity:.8;cursor:pointer;transition:opacity .2s}
+.enl:hover,.enl:focus-visible{opacity:1}
+@media(max-width:623px){
+  .gallery.tidy{grid-template-columns:minmax(0,1fr);--gallery-gap:26px}
+  .gallery.tidy figure.txt,.gallery.tidy figure.drw{aspect-ratio:auto}
+  .gallery.tidy .legend{columns:2;column-gap:20px}
+  .gallery.tidy .drw svg{max-height:none}
+  .gallery.tidy .drw figcaption{flex-direction:column;gap:4px}
+}
+
+/* ---- Drawing viewer (the enlarge button on a tidy page): the drawing full screen, in the page colour ---- */
+.dz{position:fixed;inset:0;z-index:40;background:var(--bg);color:var(--fg);display:none;flex-direction:column}
+.dz.open{display:flex}
+.dz header{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;font-size:13px}
+.dz header span{opacity:.8;font-weight:400}
+.dz header button{font:inherit;font-weight:700;color:inherit;background:none;border:1px solid color-mix(in srgb,currentColor 55%,transparent);padding:7px 12px;text-transform:uppercase;cursor:pointer}
+.dz .sc{flex:1;overflow:auto;padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
+.dz .sc svg{display:block;width:max(920px,100%);max-width:1800px;height:auto;overflow:visible;margin:0 auto}
+.dz .sc svg *{vector-effect:non-scaling-stroke}
+.dz .sc text{font-weight:400;text-transform:none}
+.dz .hintm{font-size:12px;opacity:.6;padding:0 16px 8px}
+@media(min-width:960px){.dz .hintm{display:none}}
+@media(prefers-reduced-motion:reduce){.enl{transition:none}}

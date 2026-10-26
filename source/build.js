@@ -65,6 +65,7 @@ SITE.projects.forEach(p => {
   ids.add(p.id);
   if (!SITE.mediums.some(m => m.id === p.medium)) throw new Error(p.id + ' uses an unknown medium: ' + p.medium);
   if (!/^#[0-9a-f]{6}$/i.test(p.color)) throw new Error(p.id + ' colour must look like #56704f');
+  if (p.layout != null && p.layout !== 'tidy') throw new Error(p.id + ' layout must be "tidy" (or left out for the standard layout): ' + JSON.stringify(p.layout));
   p.slug = slugify(p.slug || p.name);
   if (!p.slug) throw new Error(p.id + ': the name has no letters or numbers to make an address from. Add slug:"something" to the project.');
   const key = p.medium + '/' + p.slug;
@@ -153,7 +154,7 @@ function mapColoursInCss(css) {
     const t = toneOf(val); return t ? pre + prop + ':' + t : all;
   });
 }
-function inlineDrawing(p, im, n) {
+function inlineDrawing(p, im, n, tidy) {
   const file = path.join(SRC, 'drawings', im.drawing);
   if (!fs.existsSync(file)) { photoNotes.push(p.name + ': drawing not found, left out: source/drawings/' + im.drawing); return null; }
   let svg = fs.readFileSync(file, 'utf8');
@@ -188,7 +189,16 @@ function inlineDrawing(p, im, n) {
   const clean = tag.replace(/\s(width|height|viewBox|preserveAspectRatio|role|aria-label|style|x|y|id|version|enable-background)="[^"]*"/g, '').replace(/\sxmlns:xlink="[^"]*"/, '');
   const newTag = clean.replace(/<svg/, '<svg role="img" aria-label="' + esc(alt) + '" viewBox="' + vb[1] + '" preserveAspectRatio="xMidYMid meet" focusable="false"');
   svg = svg.replace(tag, newTag).replace(/>\s+</g, '><').trim();
-  return '      <figure class="drw">' + svg + '</figure>';
+  if (!tidy) return '      <figure class="drw">' + svg + '</figure>';
+  // layout:"tidy": the drawing sits in a box that the enlarge button and viewer (assets/js/drawings.js) attach to.
+  // A drawing in a wide (landscape) cell can carry a label and a caption underneath.
+  const viewerTitle = String(im.label || alt).replace(/^\d+\s+/, '').split(/[:.]/)[0].trim().slice(0, 70);
+  let cap = '';
+  if (im.label || im.caption) {
+    if (tidy.wide) cap = '<figcaption>' + (im.label ? '<b>' + esc(im.label) + '</b>' : '') + (im.caption ? '<span>' + esc(im.caption) + '</span>' : '') + '</figcaption>';
+    else photoNotes.push(p.name + ': the label/caption for ' + im.drawing + ' is only shown on a drawing in a wide (landscape) cell, so it is left out');
+  }
+  return '      <figure class="drw' + (tidy.wide ? ' wide' : '') + '"><div class="dw" data-title="' + esc(viewerTitle) + '">' + svg + '</div>' + cap + '</figure>';
 }
 
 // ---- gallery and page body -----------------------------------------------
@@ -198,6 +208,7 @@ async function bodyFor(p, base) {
   if (paras.length) out.push('    <div class="desc">\n' + paras.map(t => '      <p>' + esc(t) + '</p>').join('\n') + '\n    </div>');
   if ((p.details || []).length) out.push('    <dl class="details">\n' + p.details.map(kv => `      <div><dt>${esc(kv[0])}</dt><dd>${esc(kv[1])}</dd></div>`).join('\n') + '\n    </dl>');
   const items = (p.images || []).map(itemOf);
+  const tidy = p.layout === 'tidy';
   const figs = []; let ogImage = null, photoNo = 0, noAlt = 0, cell = 0;
   for (const im of items) {
     const shape = cell % 3 === 0 ? 'L' : 'S';
@@ -209,7 +220,7 @@ async function bodyFor(p, base) {
       figs.push(`      <figure class="txt"><div class="t">${im.title ? '<h2>' + esc(im.title) + '</h2>' : ''}${body}</div>${legend.length ? '<ol class="legend">' + legend.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>' : ''}</figure>`);
       cell++; continue;
     }
-    if (im.drawing) { const d = inlineDrawing(p, im, cell + 1); if (d) { figs.push(d); cell++; } continue; }
+    if (im.drawing) { const d = inlineDrawing(p, im, cell + 1, tidy ? { wide: shape === 'L' } : null); if (d) { figs.push(d); cell++; } continue; }
     const made = await makePhoto(p, im, shape);
     if (!made) continue;
     photoNo++; if (!im.alt) noAlt++;
@@ -222,7 +233,7 @@ async function bodyFor(p, base) {
     if (!ogImage) ogImage = SITE_URL + '/' + big.url;
     cell++;
   }
-  if (figs.length) out.push('    <div class="gallery">\n' + figs.join('\n') + '\n    </div>');
+  if (figs.length) out.push('    <div class="gallery' + (tidy ? ' tidy' : '') + '">\n' + figs.join('\n') + '\n    </div>' + (tidy ? '\n    <script src="' + base + 'assets/js/drawings.js" defer></script>' : ''));
   else out.push('    <div class="gallery" aria-hidden="true">\n' + [0, 1, 2, 3].map(() => '      <figure class="ph"></figure>').join('\n') + '\n    </div>');
   const sib = SITE.projects.filter(x => x.medium === p.medium), k = sib.indexOf(p), links = [];
   if (k > 0) links.push(`      <a class="ul prev" href="../${esc(sib[k - 1].slug)}/"><small>previous</small><span>${esc(sib[k - 1].name)}</span></a>`);

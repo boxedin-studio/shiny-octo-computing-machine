@@ -88,6 +88,16 @@ The photo area is a grid that repeats in threes: **1st cell wide (16:9), 2nd and
 ```
 Keep it short (about 100 characters) so it fits a square. `legend` is optional (small, ultra-light list at the bottom).
 
+**Tidy layout (for projects with lots of drawings)**
+
+Add `layout:"tidy"` to a project, next to its `color`. Its text blocks and drawings are then laid out like this:
+- the `legend` becomes a larger key with numbered circles that match the numbers in the drawing;
+- every drawing gets an **enlarge** button that opens it full screen (on a phone you drag around it);
+- phones get one column, so drawings are as wide as the screen;
+- a drawing in a wide (landscape) cell runs the full width and can have a label and caption: `{drawing:"x/plan.svg", alt:"...", label:"Ground floor plan", caption:"One short sentence."}`.
+
+Put each text block just before its drawing so the words sit on the left. Leave `layout` out for the standard grid (the ply table uses it). Export each drawing with a tight artboard (Illustrator: Object > Artboards > Fit to Artwork Bounds) so the lines fill the cell.
+
 ---
 
 ## Other things you can edit by hand
