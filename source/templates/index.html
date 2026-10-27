@@ -338,7 +338,7 @@ html.enq-open{overflow:hidden}
         finish(false);return;
       }
       busy=true;btn.disabled=true;btn.textContent='Sending\u2026';say('');
-      var body={subject:SEND.subject+' from '+data.name,from_name:'Boxed In Studio website',name:data.name,contact:data.contact,message:data.message};
+      var body={subject:SEND.subject+' from '+data.name,from_name:'Boxed In Studio website','Name':data.name,'Contact Number or Email':data.contact,'Description':data.message}; // the names in quotes are the labels in the email
       if(isEmail(data.contact))body.email=data.contact; // Web3Forms replies go to this address
       for(var k in SEND.extra)body[k]=SEND.extra[k];
       var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},15000);
