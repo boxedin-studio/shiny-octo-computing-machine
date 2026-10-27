@@ -244,11 +244,12 @@ async function bodyFor(p, base) {
 
 (async () => {
   // ---- home page ---------------------------------------------------------
-  const tabs = SITE.mediums.map(m => `<a href="#${esc(m.id)}" data-tab="${esc(m.id)}">${esc(m.label)}</a>`).join('');
-  const groups = SITE.mediums.map(m => {
+  // --o is the order in the narrow (stacked) layout: name, its list, next name, its list ...
+  const tabs = SITE.mediums.map((m, k) => `<a href="#${esc(m.id)}" data-tab="${esc(m.id)}" style="--o:${2 * k}">${esc(m.label)}</a>`).join('');
+  const groups = SITE.mediums.map((m, k) => {
     const items = SITE.projects.filter(p => p.medium === m.id).map((p, i) =>
       `<li style="--i:${i}"><a href="${esc(p.path)}" data-bg="${esc(p.color)}">${esc(p.name)}</a></li>`);
-    return `<ul class="group" data-tab="${esc(m.id)}" aria-label="${esc(m.label)} projects"><li class="group-title">${esc(m.label)}</li>${items.join('')}</ul>`;
+    return `<ul class="group" data-tab="${esc(m.id)}" style="--o:${2 * k + 1}" aria-label="${esc(m.label)} projects"><li class="group-title">${esc(m.label)}</li>${items.join('')}</ul>`;
   }).join('\n    ');
   writeRoot('index.html', withBanner(fill(readSrc('templates/index.html'), { TABS: tabs, GROUPS: groups })));
 

@@ -109,6 +109,7 @@ Put each text block just before its drawing so the words sit on the left. Leave 
 | Look of project pages (sizes, weights, spacing, grid gap) | `assets/css/project.css` |
 | Header info row: labels solid, values faded | `.details dt` and `.details dd` in `assets/css/project.css` |
 | Speed of the project list animation | `--open-delay`, `--row-in-step` etc. in `source/templates/index.html` |
+| Width where the home page menu stacks (Architecture above Carpentry) | `900px` in two places in `source/templates/index.html`: the CSS `@media (max-width:900px)` block near the end of the styles, and `matchMedia` in the script. Keep them the same |
 | Link preview image (when shared on iMessage, social) | `assets/img/og-image.png` |
 | Browser tab icon | `favicon.ico` and `assets/img/apple-touch-icon.png` |
 | Logo (changes colour with the text) | `assets/img/boxed-in-logo.svg` |
