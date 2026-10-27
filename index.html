@@ -22,6 +22,8 @@
 <style>
 @font-face{font-family:"Aileron";font-weight:400;font-style:normal;font-display:swap;src:url(assets/fonts/aileron-regular.woff2) format("woff2")}
 @font-face{font-family:"Aileron";font-weight:700;font-style:normal;font-display:swap;src:url(assets/fonts/aileron-bold.woff2) format("woff2")}
+@font-face{font-family:"Aileron";font-weight:100;font-style:normal;font-display:swap;src:url(assets/fonts/aileron-thin.woff2) format("woff2")}
+@font-face{font-family:"Aileron";font-weight:300;font-style:normal;font-display:swap;src:url(assets/fonts/aileron-light.woff2) format("woff2")}
 :root{--bg:#2f4bff;--fg:#ffffff;--pad:clamp(16px,2.2vw,32px);box-sizing:border-box}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
@@ -81,7 +83,55 @@ html.intro-seen .page{animation:none}
 .group a:focus-visible{outline-offset:-2px}
 .group.opening li{animation-delay:calc(var(--i)*var(--row-in-step))}
 }
+/*
+  COMMISSIONS POP-UP (opens from the "commissions" link in the bottom-left list; a form on this page, not another page)
+  Wide screens: a panel in the bottom-left corner. Narrow screens (623px and under): the whole screen.
+*/
+html.enq-open{overflow:hidden}
+.enq{position:fixed;inset:auto auto calc(var(--pad) + env(safe-area-inset-bottom,0px)) var(--pad);margin:0;padding:0;width:min(480px,calc(100vw - 2*var(--pad)));max-width:none;height:auto;max-height:calc(100vh - 2*var(--pad));max-height:calc(100dvh - 2*var(--pad));overflow:auto;overscroll-behavior:contain;background:#2f4bff;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:0;outline:none;text-transform:none;font-weight:400}
+.enq::backdrop{background:rgba(6,12,70,.58)}
+.enq[open]{animation:enq-in .32s cubic-bezier(.2,.7,.2,1) both}
+.enq[open]::backdrop{animation:enq-fade .32s ease both}
+.enq.out{animation:enq-out .18s ease both}
+.enq.out::backdrop{animation:enq-fade-out .18s ease both}
+@keyframes enq-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes enq-out{to{opacity:0;transform:translateY(8px)}}
+@keyframes enq-fade{from{opacity:0}}
+@keyframes enq-fade-out{to{opacity:0}}
+.enq-in{display:flex;flex-direction:column;gap:18px;padding:20px 22px 22px}
+.enq-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.enq h2{margin:0;font:inherit;font-size:1.25em;font-weight:700;text-transform:uppercase;letter-spacing:-.005em}
+.enq-x{appearance:none;-webkit-appearance:none;background:none;border:0;border-radius:0;margin:0;padding:6px 0 6px 12px;color:inherit;font:inherit;font-weight:700;text-transform:uppercase;opacity:.6;cursor:pointer;transition:opacity .35s ease}
+.enq-x:hover,.enq-x:focus-visible{opacity:1}
+.enq-form{display:flex;flex-direction:column;gap:12px}
+.enq-f{position:relative}
+.enq-f input,.enq-f textarea{display:block;width:100%;margin:0;border:1px solid rgba(255,255,255,.7);border-radius:0;background:transparent;color:#fff;font-family:inherit;font-size:max(16px,1.0625rem);font-weight:300;line-height:1.4;letter-spacing:0;text-transform:none;padding:25px 14px 8px;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.enq-f input{height:60px}
+.enq-f textarea{min-height:156px;padding-top:32px;resize:vertical}
+.enq-f input:focus,.enq-f textarea:focus{border-color:#fff;box-shadow:inset 0 0 0 1px #fff}
+.enq-f [aria-invalid]{border-color:#fff;box-shadow:inset 0 0 0 2px #fff}
+.enq-f input:-webkit-autofill{-webkit-text-fill-color:#fff;box-shadow:inset 0 0 0 100px #2f4bff;caret-color:#fff}
+.enq-f label{position:absolute;left:15px;top:19px;right:15px;pointer-events:none;color:#fff;font-size:max(16px,1.0625rem);font-weight:100;line-height:1.25;text-transform:none;letter-spacing:0;opacity:.8}
+.enq-f .l-short{display:none}
+.enq-f input:focus+label,.enq-f input:not(:placeholder-shown)+label,.enq-f textarea:focus+label,.enq-f textarea:not(:placeholder-shown)+label{top:9px;font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.8}
+.enq-f input:-webkit-autofill+label{top:9px;font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.8}
+.enq-f textarea:focus+label .l-long,.enq-f textarea:not(:placeholder-shown)+label .l-long{display:none}
+.enq-f textarea:focus+label .l-short,.enq-f textarea:not(:placeholder-shown)+label .l-short{display:inline}
+.enq-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+.enq-err{margin:0;padding:10px 14px;border:1px solid #fff;font-size:.9375rem;font-weight:700;line-height:1.3}
+.enq-send{appearance:none;-webkit-appearance:none;display:block;width:100%;margin:6px 0 0;min-height:54px;padding:16px 28px;border:0;border-radius:0;background:#fff;color:#2f4bff;font:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:opacity .25s ease}
+.enq-send:hover{opacity:.88}
+.enq-send:disabled{opacity:.55;cursor:default}
+.enq-send:focus-visible,.enq-x:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.enq-note{margin:0;font-size:.8125rem;line-height:1.35;opacity:.7}
+.enq-done{display:flex;flex-direction:column;gap:14px;outline:none}
+.enq-done p{margin:0;font-size:max(16px,1.0625rem);line-height:1.4}
+@media (max-width:623px){
+.enq{inset:0;width:100%;height:100vh;height:100dvh;max-height:none;border:0}
+.enq-in{min-height:100%;padding:calc(18px + env(safe-area-inset-top,0px)) var(--pad) calc(24px + env(safe-area-inset-bottom,0px))}
+}
 @media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.group li{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.enq,.enq::backdrop{animation:none!important}.enq-f input,.enq-f textarea{transition:none}}
 </style>
 <noscript><style>.tabs{display:none}.projects{display:block;height:auto!important}.group{visibility:visible;pointer-events:auto;margin-left:0!important;height:auto!important;overflow:visible}.group+.group{margin-top:20px}.group-title{display:block}</style></noscript>
 <script>try{if(sessionStorage.getItem("introSeen"))document.documentElement.className+=" intro-seen"}catch(e){}</script>
@@ -99,10 +149,42 @@ html.intro-seen .page{animation:none}
     <li><a href="archive/">archive</a></li>
     <li><a href="studio/">studio</a></li>
     <li><a href="journal/">journal</a></li>
+    <li><a href="mailto:harry@boxedin.studio?subject=Commission%20enquiry" id="enq-open">commissions</a></li>
     <li><a href="tel:+642102963024"><strong>+64&nbsp;21&nbsp;029&nbsp;63024</strong></a></li>
     <li><a href="mailto:harry@boxedin.studio"><strong>harry@boxedin.studio</strong></a></li>
   </ul>
 </main>
+<dialog class="enq" id="enq" aria-labelledby="enq-title" autofocus tabindex="-1">
+  <div class="enq-in">
+    <div class="enq-head">
+      <h2 id="enq-title">Commissions</h2>
+      <button type="button" class="enq-x" data-close>close</button>
+    </div>
+    <form class="enq-form" novalidate>
+      <div class="enq-f">
+        <textarea id="enq-msg" name="message" rows="5" placeholder=" " required></textarea>
+        <label for="enq-msg"><span class="l-long">Provide a brief description of what you are wanting</span><span class="l-short">Your project</span></label>
+      </div>
+      <div class="enq-f">
+        <input id="enq-name" name="name" type="text" autocomplete="name" placeholder=" " required>
+        <label for="enq-name">Name</label>
+      </div>
+      <div class="enq-f">
+        <input id="enq-contact" name="contact" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder=" " required>
+        <label for="enq-contact">Contact Number or Email</label>
+      </div>
+      <input class="enq-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <p class="enq-err" role="alert" hidden></p>
+      <button type="submit" class="enq-send">Send</button>
+      <p class="enq-note">Your details are only used to reply to your enquiry.</p>
+    </form>
+    <div class="enq-done" tabindex="-1" hidden>
+      <h2>Thank you</h2>
+      <p>Your message has been sent.</p>
+      <button type="button" class="enq-send" data-close>Close</button>
+    </div>
+  </div>
+</dialog>
 <script>
 (function(){
   var root=document.documentElement;
@@ -203,6 +285,71 @@ html.intro-seen .page{animation:none}
   });
   tabs.addEventListener('mouseleave',off);tabs.addEventListener('focusout',function(e){if(!tabs.contains(e.relatedTarget))off()});
   window.addEventListener('hashchange',function(){var n=location.hash.slice(1);if(groups[n])show(n)});
+  // ---- Commissions pop-up: a dialog on this page that opens from the "commissions" link.
+  (function(){
+    var dlg=document.getElementById('enq'),opener=document.getElementById('enq-open');
+    if(!dlg||!opener||typeof dlg.showModal!=='function')return; // an older browser keeps the plain email link
+    // WHERE ENQUIRIES GO: Web3Forms (web3forms.com) sends each message to your inbox.
+    //   Paste your Web3Forms access key between the quotes after access_key. It is made to sit in a web page, so it is not secret.
+    //   While the key is empty, Send opens the visitor's own email app with the message ready, addressed to emailTo.
+    var SEND={url:'https://api.web3forms.com/submit',extra:{access_key:'e2312243-6b4e-4bfd-8fab-d1a94bfcdcb4'},emailTo:'harry@boxedin.studio',subject:'Commission enquiry'};
+    var form=dlg.querySelector('form'),done=dlg.querySelector('.enq-done'),say_=dlg.querySelector('.enq-err'),btn=form.querySelector('.enq-send'),
+        msg=form.elements['message'],nm=form.elements['name'],tel=form.elements['contact'],trap=form.elements['website'],busy=false,downAt=null;
+    function say(t){say_.textContent=t;say_.hidden=!t}
+    function fields(f){[msg,nm,tel].forEach(f)}
+    function open(){
+      form.reset();form.hidden=false;done.hidden=true;say('');busy=false;btn.disabled=false;btn.textContent='Send';
+      fields(function(f){f.removeAttribute('aria-invalid')});
+      dlg.classList.remove('out');root.classList.add('enq-open');dlg.showModal();
+    }
+    function close(){
+      if(!dlg.open||dlg.classList.contains('out'))return;
+      if(reduce){dlg.close();return}
+      dlg.classList.add('out');setTimeout(function(){dlg.close()},180);
+    }
+    dlg.addEventListener('close',function(){root.classList.remove('enq-open');dlg.classList.remove('out');off();try{opener.focus({preventScroll:true})}catch(e){}});
+    var warmed=false;function warm(){if(warmed||!document.fonts||!document.fonts.load)return;warmed=true;document.fonts.load('100 17px Aileron');document.fonts.load('300 17px Aileron')}
+    ['mouseenter','focus','touchstart'].forEach(function(n){opener.addEventListener(n,warm,{passive:true})});
+    opener.addEventListener('click',function(e){if(e.metaKey||e.ctrlKey||e.shiftKey||e.button!==0)return;e.preventDefault();open()});
+    // clicking the dimmed area outside the panel closes it (but not when a text selection ends there)
+    dlg.addEventListener('mousedown',function(e){downAt=e.target});
+    dlg.addEventListener('click',function(e){if(e.target===dlg&&downAt===dlg)close();downAt=null});
+    Array.prototype.forEach.call(dlg.querySelectorAll('[data-close]'),function(b){b.addEventListener('click',close)});
+    function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)}
+    function bad(f,t){f.setAttribute('aria-invalid','true');say(t);f.focus();return false}
+    function check(){
+      fields(function(f){f.removeAttribute('aria-invalid')});say('');
+      if(!msg.value.trim())return bad(msg,'Please add a short description of your project.');
+      if(!nm.value.trim())return bad(nm,'Please add your name.');
+      var c=tel.value.trim();
+      if(!c)return bad(tel,'Please add a contact number or email.');
+      if(!isEmail(c)&&c.replace(/\D/g,'').length<6)return bad(tel,'That does not look like a number or an email address.');
+      return true;
+    }
+    fields(function(f){f.addEventListener('input',function(){if(f.hasAttribute('aria-invalid')){f.removeAttribute('aria-invalid');say('')}})});
+    function finish(sent){
+      done.querySelector('p').textContent=sent?'Your message has been sent.':'Your email app should now open with your message ready. Press send there to finish.';
+      form.hidden=true;done.hidden=false;done.focus();
+    }
+    form.addEventListener('submit',function(e){
+      e.preventDefault();if(busy||!check())return;
+      var data={name:nm.value.trim(),contact:tel.value.trim(),message:msg.value.trim()};
+      if(trap.value){finish(true);return} // a hidden box that only spam robots fill in
+      if(!SEND.url||!SEND.extra.access_key){
+        location.href='mailto:'+SEND.emailTo+'?subject='+encodeURIComponent(SEND.subject)+'&body='+encodeURIComponent(data.message+'\n\nName: '+data.name+'\nContact: '+data.contact);
+        finish(false);return;
+      }
+      busy=true;btn.disabled=true;btn.textContent='Sending\u2026';say('');
+      var body={subject:SEND.subject+' from '+data.name,from_name:'Boxed In Studio website',name:data.name,contact:data.contact,message:data.message};
+      if(isEmail(data.contact))body.email=data.contact; // Web3Forms replies go to this address
+      for(var k in SEND.extra)body[k]=SEND.extra[k];
+      var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},15000);
+      fetch(SEND.url,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body),signal:ctl?ctl.signal:undefined})
+        .then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(!r.ok||j.success===false||j.ok===false)throw new Error('not sent')})})
+        .then(function(){clearTimeout(t);finish(true)})
+        .catch(function(){clearTimeout(t);busy=false;btn.disabled=false;btn.textContent='Send';say('That did not send. Please try again, or email '+SEND.emailTo+'.')});
+    });
+  })();
   // Coming back to the page with the Back button (phones keep it in memory): clear any hover/tap colour left behind
   window.addEventListener('pageshow',function(e){if(e.persisted)off()});
 })();
