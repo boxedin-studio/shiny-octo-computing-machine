@@ -64,9 +64,26 @@ html.intro-seen .page{animation:none}
 .group.closing li{animation:row-out var(--row-out-time) linear both;animation-delay:calc(var(--i)*var(--row-out-step))}
 @keyframes row-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 @keyframes row-out{from{opacity:1}to{opacity:0}}
+/*
+  NARROW SCREENS (900px and under, the same point where the logo moves above the menu)
+  Carpentry sits under Architecture as plain stacked text, each list opening directly under its own name.
+  Opening: the old list fades where it stands, then it closes, the next name moves up, and the new rows drop in one after another.
+  The width 900px here must match the 900px in the script (matchMedia).
+*/
+@media (max-width:900px){
+.top{gap:0}
+.tabs,.projects{display:contents}
+.tabs a{order:var(--o);align-self:flex-start}
+.group{order:var(--o);overflow:hidden;height:0;margin-left:0!important}
+.group.open{height:auto}
+.group-title+li{margin-top:10px}
+.group li:last-child{margin-bottom:14px}
+.group a:focus-visible{outline-offset:-2px}
+.group.opening li{animation-delay:calc(var(--i)*var(--row-in-step))}
+}
 @media (prefers-reduced-motion:reduce){body,a{transition:none}.page,.group li{animation:none!important}}
 </style>
-<noscript><style>.tabs{display:none}.projects{display:block;height:auto!important}.group{visibility:visible;pointer-events:auto;margin-left:0!important}.group+.group{margin-top:20px}.group-title{display:block}</style></noscript>
+<noscript><style>.tabs{display:none}.projects{display:block;height:auto!important}.group{visibility:visible;pointer-events:auto;margin-left:0!important;height:auto!important;overflow:visible}.group+.group{margin-top:20px}.group-title{display:block}</style></noscript>
 <script>try{if(sessionStorage.getItem("introSeen"))document.documentElement.className+=" intro-seen"}catch(e){}</script>
 </head>
 <body>
@@ -74,9 +91,9 @@ html.intro-seen .page{animation:none}
   <h1 class="sr-only">Boxed In Studio – architecture and carpentry</h1>
   <a class="logo" href="./" aria-label="Boxed In home"></a>
   <div class="top">
-    <nav class="tabs" id="tabs" aria-label="Project categories"><a href="#architecture" data-tab="architecture">architecture</a><a href="#carpentry" data-tab="carpentry">carpentry</a></nav>
-    <div class="projects" id="projects"><ul class="group" data-tab="architecture" aria-label="architecture projects"><li class="group-title">architecture</li><li style="--i:0"><a href="projects/architecture/whananaki-residence/" data-bg="#af3348">whananaki residence</a></li><li style="--i:1"><a href="projects/architecture/mangawhai-house/" data-bg="#1f6c65">mangawhai house</a></li></ul>
-    <ul class="group" data-tab="carpentry" aria-label="carpentry projects"><li class="group-title">carpentry</li><li style="--i:0"><a href="projects/carpentry/ply-table/" data-bg="#206f3d">ply table</a></li><li style="--i:1"><a href="projects/carpentry/totara-desktop/" data-bg="#a0452e">totara desktop</a></li><li style="--i:2"><a href="projects/carpentry/chopping-board/" data-bg="#2e639f">chopping board</a></li><li style="--i:3"><a href="projects/carpentry/misc-carpentry/" data-bg="#706021">misc carpentry</a></li><li style="--i:4"><a href="projects/carpentry/oak-bench/" data-bg="#8c6a14">oak bench</a></li></ul></div>
+    <nav class="tabs" id="tabs" aria-label="Project categories"><a href="#architecture" data-tab="architecture" style="--o:0">architecture</a><a href="#carpentry" data-tab="carpentry" style="--o:2">carpentry</a></nav>
+    <div class="projects" id="projects"><ul class="group" data-tab="architecture" style="--o:1" aria-label="architecture projects"><li class="group-title">architecture</li><li style="--i:0"><a href="projects/architecture/whananaki-residence/" data-bg="#af3348">whananaki residence</a></li><li style="--i:1"><a href="projects/architecture/mangawhai-house/" data-bg="#1f6c65">mangawhai house</a></li></ul>
+    <ul class="group" data-tab="carpentry" style="--o:3" aria-label="carpentry projects"><li class="group-title">carpentry</li><li style="--i:0"><a href="projects/carpentry/ply-table/" data-bg="#206f3d">ply table</a></li><li style="--i:1"><a href="projects/carpentry/totara-desktop/" data-bg="#a0452e">totara desktop</a></li><li style="--i:2"><a href="projects/carpentry/chopping-board/" data-bg="#2e639f">chopping board</a></li><li style="--i:3"><a href="projects/carpentry/misc-carpentry/" data-bg="#706021">misc carpentry</a></li><li style="--i:4"><a href="projects/carpentry/oak-bench/" data-bg="#8c6a14">oak bench</a></li></ul></div>
   </div>
   <ul class="info">
     <li><a href="archive/">archive</a></li>
@@ -122,7 +139,10 @@ html.intro-seen .page{animation:none}
   var rowOutStep=0,rowOutTime=150; // keep the same as --row-out-step and --row-out-time in the CSS
   function markTab(name){tabLinks.forEach(function(t){var on=t.dataset.tab===name;t.classList.toggle('current',on);t.setAttribute('aria-selected',on?'true':'false');t.setAttribute('tabindex',on?'0':'-1')})}
   // Line each list up under its own tab, and size the block to the open list
+  var narrow=window.matchMedia('(max-width:900px)'); // keep 900px the same as in the CSS
+  var pending=null;
   function align(){
+    if(narrow.matches){tabLinks.forEach(function(t){var g=groups[t.dataset.tab];if(g)g.style.marginLeft=''});return}
     tabLinks.forEach(function(t){var g=groups[t.dataset.tab];if(g)g.style.marginLeft=Math.max(0,t.offsetLeft-list.offsetLeft)+'px'});
     if(current&&groups[current])list.style.height=groups[current].offsetHeight+'px';
   }
@@ -145,11 +165,27 @@ html.intro-seen .page{animation:none}
   function show(name){
     if(!groups[name])name=tabLinks[0].dataset.tab;
     if(name===current)return name;
+    var prevName=current;
     current=name;markTab(name);
+    if(narrow.matches){showStacked(name,prevName);align();return name}
     Object.keys(groups).forEach(function(k){if(k!==name)closeGroup(groups[k])});
     openGroup(groups[name]);
     align();
     return name;
+  }
+  // Narrow screens, one after the other: the old list fades where it stands (rowOutTime),
+  // then it closes and the new one opens at the same moment, its rows dropping in.
+  function showStacked(name,prevName){
+    clearTimeout(pending);
+    var next=groups[name],prev=prevName?groups[prevName]:null;
+    Object.keys(groups).forEach(function(k){var g=groups[k];if(g!==next&&g!==prev){clearTimeout(g._t);g.classList.remove('open','opening','closing');g.setAttribute('aria-hidden','true')}});
+    if(next.classList.contains('open')){clearTimeout(next._t);next.classList.remove('closing');next.removeAttribute('aria-hidden');return} // tapped back while it was still fading
+    if(prev&&prev.classList.contains('open')){
+      clearTimeout(prev._t);prev.classList.remove('opening');prev.setAttribute('aria-hidden','true');
+      if(reduce){prev.classList.remove('open','closing');openGroup(next);return}
+      prev.classList.add('closing');
+      pending=setTimeout(function(){prev.classList.remove('open','closing');openGroup(next)},rowOutTime);
+    }else openGroup(next);
   }
   // Keep the list hidden during the page intro, then open the first tab.
   // introListDelay = milliseconds after load on a first visit; repeat visits open at once.
