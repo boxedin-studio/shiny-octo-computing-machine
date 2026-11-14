@@ -1,11 +1,13 @@
 {
   "architecture-1": {
     "current": "whananaki-residence",
-    "old": []
+    "old": [],
+    "medium": "architecture"
   },
   "architecture-2": {
     "current": "mangawhai-house",
-    "old": []
+    "old": [],
+    "medium": "architecture"
   },
   "architecture-3": {
     "current": "piha-bach",
@@ -21,23 +23,28 @@
   },
   "carpentry-1": {
     "current": "ply-table",
-    "old": []
+    "old": [],
+    "medium": "carpentry"
   },
   "carpentry-2": {
     "current": "totara-desktop",
-    "old": []
+    "old": [],
+    "medium": "carpentry"
   },
   "carpentry-3": {
     "current": "chopping-board",
-    "old": []
+    "old": [],
+    "medium": "carpentry"
   },
   "carpentry-4": {
     "current": "misc-carpentry",
-    "old": []
+    "old": [],
+    "medium": "carpentry"
   },
   "carpentry-5": {
     "current": "oak-bench",
-    "old": []
+    "old": [],
+    "medium": "carpentry"
   },
   "carpentry-6": {
     "current": "kauri-shelving",
