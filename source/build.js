@@ -73,12 +73,14 @@ SITE.projects.forEach(p => {
   if (taken.has(key)) throw new Error('Two ' + p.medium + ' projects would share the address /projects/' + key + '/ . Give one of them a different name (or add slug:"…").');
   taken.add(key);
   p.path = 'projects/' + p.medium + '/' + p.slug + '/';
-  const rec = slugRecord[p.id] || (slugRecord[p.id] = { medium: p.medium, current: p.slug, old: [] });
-  const was = (rec.medium || p.medium) + '/' + rec.current;   // old addresses are kept as "medium/name", so moving a project to another tab forwards too
-  if (was !== key && !rec.old.includes(was)) rec.old.push(was);
-  rec.medium = p.medium; rec.current = p.slug;
-  rec.old = rec.old.filter(s => s !== key);
+  trackAddress(slugRecord[p.id] || (slugRecord[p.id] = { medium: p.medium, current: p.slug, old: [] }), p.medium, p.slug);
 });
+function trackAddress(rec, medium, slug) {
+  const key = medium + '/' + slug, was = (rec.medium || medium) + '/' + rec.current;   // old addresses are kept as "medium/name", so moving a project to another tab forwards too
+  if (was !== key && !rec.old.includes(was)) rec.old.push(was);
+  rec.medium = medium; rec.current = slug;
+  rec.old = rec.old.filter(s => s !== key);
+}
 
 // ---- photos --------------------------------------------------------------
 const usedFiles = new Set(), photoNotes = [];
@@ -245,7 +247,7 @@ async function bodyFor(p, base) {
   return { html: out.join('\n'), ogImage, noAlt, photos: photoNo };
 }
 
-(async () => {
+const main = async () => {
   // ---- home page ---------------------------------------------------------
   // --o is the order in the narrow (stacked) layout: name, its list, next name, its list ...
   const tabs = SITE.mediums.map((m, k) => `<a href="#${esc(m.id)}" data-tab="${esc(m.id)}" style="--o:${2 * k}">${esc(m.label)}</a>`).join('');
@@ -310,4 +312,7 @@ async function bodyFor(p, base) {
   if (legacy.length) console.log('Removed old numbered pages: ' + legacy.join(', '));
   if (photoNotes.length) console.log('\nPhotos:\n  ' + photoNotes.join('\n  '));
   if (warnings.length) console.log('\nStill to fill in (this is fine while you are setting up):\n  ' + warnings.join('\n  '));
-})().catch(e => { console.error('\nBuild stopped: ' + e.message); process.exit(1); });
+};
+// Run as "node source/build.js" it builds the site; loaded by source/build.test.js it only hands over the functions to check.
+if (require.main === module) main().catch(e => { console.error('\nBuild stopped: ' + e.message); process.exit(1); });
+else module.exports = { slugify, toneOf, trackAddress, inlineDrawing };

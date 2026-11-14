@@ -139,6 +139,7 @@ assets/
 source/
   projects.js         YOUR PROJECTS. The file you edit.
   build.js            The builder (runs on GitHub each time you push)
+  build.test.js       Checks the builder before each rebuild (uses test/)
   templates/          Page layouts
   photos/             Your original photos
   drawings/           Your original SVG drawings
