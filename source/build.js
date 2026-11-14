@@ -20,7 +20,8 @@ const SRC = __dirname, ROOT = path.join(SRC, '..');
 const SITE_URL = 'https://boxedin.studio';
 const STATIC_PAGES = ['archive', 'studio', 'journal'];           // hand-written pages (folders in the main folder)
 const PLACEHOLDER = /Short description of the project goes here|^\s*coming soon/i;
-const isPlaceholder = p => PLACEHOLDER.test(p.description || '');   // pages still using the placeholder text are hidden from search engines until you write a real description
+// pages still using the placeholder text, or with a details value of "Illustrative placeholder", are hidden from search engines
+const isPlaceholder = p => PLACEHOLDER.test(p.description || '') || (p.details || []).some(kv => /illustrative placeholder/i.test(kv[1]));
 // Photo shapes. In each group of three cells the 1st is landscape, the 2nd and 3rd are squares.
 // (If you change the landscape ratio here, change the 16/9 for .gallery figure:nth-child(3n+1) in assets/css/project.css too.)
 const LANDSCAPE = 16 / 9;
@@ -72,9 +73,11 @@ SITE.projects.forEach(p => {
   if (taken.has(key)) throw new Error('Two ' + p.medium + ' projects would share the address /projects/' + key + '/ . Give one of them a different name (or add slug:"…").');
   taken.add(key);
   p.path = 'projects/' + p.medium + '/' + p.slug + '/';
-  const rec = slugRecord[p.id] || (slugRecord[p.id] = { current: p.slug, old: [] });
-  if (rec.current !== p.slug) { if (!rec.old.includes(rec.current)) rec.old.push(rec.current); rec.current = p.slug; }
-  rec.old = rec.old.filter(s => s !== p.slug);
+  const rec = slugRecord[p.id] || (slugRecord[p.id] = { medium: p.medium, current: p.slug, old: [] });
+  const was = (rec.medium || p.medium) + '/' + rec.current;   // old addresses are kept as "medium/name", so moving a project to another tab forwards too
+  if (was !== key && !rec.old.includes(was)) rec.old.push(was);
+  rec.medium = p.medium; rec.current = p.slug;
+  rec.old = rec.old.filter(s => s !== key);
 });
 
 // ---- photos --------------------------------------------------------------
@@ -171,7 +174,7 @@ function inlineDrawing(p, im, n, tidy) {
     css = css.replace(/#([A-Za-z_][\w-]*)/g, (m, id) => ids.has(id) ? '#' + k + '-' + id : m);
     return a + mapColoursInCss(css) + z;
   });
-  svg = svg.replace(/\sid="([^"]*)"/g, ' id="' + k + '-$1"').replace(/url\(#([^)]+)\)/g, 'url(#' + k + '-$1)').replace(/href="#([^"]+)"/g, 'href="#' + k + '-$1"');
+  svg = svg.replace(/\sid="([^"]*)"/g, ' id="' + k + '-$1"').replace(new RegExp('url\\(#(?!' + k + '-)([^)]+)\\)', 'g'), 'url(#' + k + '-$1)')   // (?!…) skips the ones the style block above already renamed.replace(/href="#([^"]+)"/g, 'href="#' + k + '-$1"');
   // colours written directly on shapes (fill="#000" and style="...") become tones of the text and page colours
   svg = svg.replace(/<([a-zA-Z][\w:-]*)((?:\s[^<>]*?)?)(\/?)>/g, (all, tag, attrs, close) => {
     if (/^(svg|style|\/)/i.test(tag) && tag.toLowerCase() !== 'svg') return all;
@@ -260,7 +263,7 @@ async function bodyFor(p, base) {
     const base = '../../../';
     const body = await bodyFor(p, base);
     const todo = [];
-    if (isPlaceholder(p)) todo.push('description (hidden from search engines until written)');
+    if (isPlaceholder(p)) todo.push('real description or details (hidden from search engines until then)');
     if ((p.details || []).some(kv => ['0000', 'materials', 'location', 'type', '$0'].includes(kv[1]))) todo.push('details');
     if (!body.photos) todo.push('photos'); else if (body.noAlt) todo.push('photo descriptions (alt)');
     if (todo.length) warnings.push(p.name.padEnd(20) + ' still needs: ' + todo.join(', '));
@@ -288,7 +291,7 @@ async function bodyFor(p, base) {
   const redirects = {};
   SITE.projects.forEach(p => {
     redirects[p.id] = '/' + p.path;                                         // the old address, e.g. /carpentry-1.html
-    slugRecord[p.id].old.forEach(s => { redirects['projects/' + p.medium + '/' + s] = '/' + p.path; });
+    slugRecord[p.id].old.forEach(s => { redirects['projects/' + s] = '/' + p.path; });
   });
   STATIC_PAGES.forEach(s => { redirects[s] = '/' + s + '/'; });
   writeRoot('404.html', fill(readSrc('templates/404.html'), { REDIRECTS: JSON.stringify(redirects) }));
