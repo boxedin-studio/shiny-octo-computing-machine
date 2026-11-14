@@ -9,6 +9,7 @@ on:
     paths:
       - 'source/projects.js'
       - 'source/build.js'
+      - 'source/package*.json'
       - 'source/templates/**'
       - 'source/photos/**'
       - 'source/drawings/**'
@@ -33,7 +34,8 @@ jobs:
         with:
           node-version: 22
       - name: Install the builder's tools
-        run: npm install --prefix source --no-package-lock --no-audit --no-fund
+        # npm ci installs the exact versions listed in source/package-lock.json
+        run: npm ci --prefix source --no-audit --no-fund
       - name: Rebuild the pages
         run: node source/build.js
       - name: Commit the rebuilt pages
