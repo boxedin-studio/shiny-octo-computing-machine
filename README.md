@@ -2,7 +2,7 @@
 
 The site for boxedin.studio. It is a plain set of web pages (no server, no database), hosted free on GitHub Pages.
 
-You do almost everything in **one file: `source/projects.js`**. Edit it, then commit and push, then commit and push in GitHub Desktop.
+You do almost everything in **one file: `source/projects.js`**. Edit it, then commit and push in GitHub Desktop.
 
 ---
 

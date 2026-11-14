@@ -2,7 +2,8 @@
 /*
   build.js  -  turns projects.js (and your photos) into the real pages of the site.
 
-  Run it with:   node source/build.js        (Claude runs this for you when you say COMMIT)
+  GitHub runs it for you each time you push (see .github/workflows/build.yml).
+  To run it yourself:   cd source && npm ci && cd .. && node source/build.js
 
   It reads source/projects.js, the templates in source/templates/ and the originals in source/photos/, and writes:
     index.html                              the home page (project lists are real HTML)

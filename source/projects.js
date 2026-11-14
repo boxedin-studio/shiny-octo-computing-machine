@@ -2,7 +2,7 @@
   ==========================================================================
   YOUR PROJECTS  -  this is the file you edit to change the menu and the project pages
   ==========================================================================
-  After you edit it, ask Claude to rebuild the site (that turns this file into the real pages).
+  After you edit it, commit and push in GitHub Desktop. GitHub then rebuilds the site (that turns this file into the real pages).
 
   RENAME a project:   change its  name.  The web address follows the name, so
                       "ply table" lives at boxedin.studio/projects/carpentry/ply-table/
@@ -32,7 +32,7 @@
          {src:"ply-table/ply-table-01.jpg", alt:"Describe the photo for screen readers and search", focus:"50% 60%"}
        focus is optional. It chooses what stays in the frame when a photo has to be cropped:
        the first number is left-to-right, the second is top-to-bottom (50% 50% is the centre, "50% 0%" the top).
-    3. Ask Claude to rebuild. The site makes a small fast copy for the page and a large copy for when someone
+    3. Commit and push. The rebuild makes a small fast copy for the page and a large copy for when someone
        clicks the photo (which shows the whole photo, uncropped).
     The layout repeats in threes: 1st cell landscape (16:9, like 1920x1080), 2nd and 3rd square. Any photo is cropped to fit its cell.
     A photo's EXIF data (including GPS location) is not copied into the website's versions.
@@ -183,7 +183,7 @@ window.SITE = {
 
     // ---- READY TO USE (hidden for now) ----
     // To show one, delete the // at the start of each of its lines, then set its name.
-    // Their pages are created when you rebuild the site.
+    // Their pages are created by the rebuild after you commit and push.
     // {id:"architecture-6", medium:"architecture", name:"project name", color:"#7a5c46",
     //  description:"Short description of the project goes here. A sentence or two about what it is and what makes it special.",
     //  details:[["year","0000"],["location","location"],["type","type"]],
